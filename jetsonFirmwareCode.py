@@ -2,15 +2,49 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import sleep
 from array import *
+from smbus2 import SMBus
 
 # variables
 UPDATE_INTERVAL_MS = 10
+
+# Constants
+PCA9685_ADDRESS = 0x40  # Default I2C address
+MODE1 = 0x00
+PRESCALE = 0xFE
+LED0_ON_L = 0x06
+FREQ = 50  # Frequency in Hz
 
 # constants for invers kinematics
 lengthA = 35.7
 lengthE = 151.5
 lengthF = 136.5
 
+# constants for servo index
+br0_calibValue = 10
+br1_calibValue = 0
+br2_calibValue = 0
+br0 = 13
+br1 = 14
+br2 = 15
+
+def set_pwm_freq(bus, freq_hz):
+    prescale_val = int(25000000.0 / (4096 * freq_hz) - 1)
+    bus.write_byte_data(PCA9685_ADDRESS, MODE1, 0x10)  # Enter sleep mode
+    bus.write_byte_data(PCA9685_ADDRESS, PRESCALE, prescale_val)
+    bus.write_byte_data(PCA9685_ADDRESS, MODE1, 0x80)  # Restart PCA9685
+
+def set_pwm(bus, channel, on, off):
+    bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel, on & 0xFF)
+    bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel + 1, on >> 8)
+    bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel + 2, off & 0xFF)
+    bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel + 3, off >> 8)
+
+def angle_to_pwm(angle):
+    # Map 0°-180° to ~205-410
+    min_pwm = 100
+    max_pwm = 510
+    pulse_length = int(min_pwm + (angle / 180.0) * (max_pwm - min_pwm))
+    return pulse_length
 
 def draw_Leg(base_points, length1, length2, angle1, angle2, colourSet, clear):
 
@@ -100,34 +134,79 @@ def makeFramesArray(targetPoints, currentPoints, totalMoveTime):
 def sendFrame_shift(angles, shift, shift_index, time):
     delay = time / angles.shape[0]
     print(angles.shape[0])
-    #print(delay)
+    print(delay)
     for i in range(len(angles)):
-        if shift_index == 0:
-            draw_Leg([0,0], 151.5, 136.5,  -90 - angles[i- shift][1], 180- angles[i- shift][2], 1, 1)
-        else:
-            draw_Leg([0,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 1)
-            print(f"{angles[i][1]}  ---  {angles[i][2]}")
+        #if shift_index == 0:
+        #    draw_Leg([0,0], 151.5, 136.5,  -90 - angles[i- shift][1], 180- angles[i- shift][2], 1, 1)
+        #else:
+        #    draw_Leg([0,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 1)
+        #    print(f"{angles[i][1]}  ---  {angles[i][2]}")
 
-        if shift_index == 5:    
-            draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i - shift][1], 180- angles[i - shift][2], 1, 0)
-        else:
-            draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 0)
+        with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
+            set_pwm_freq(bus, FREQ)
+    
+            #br
+            pwm_value0 = angle_to_pwm(angles[i][0] + br0_calibValue)
+            set_pwm(bus, 13, 0, pwm_value0)
 
-        
-        if shift_index == 5:
-            draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i- shift][1], 180- angles[i- shift][2], 2, 0)
-        else:
-            draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
+            pwm_value1 = angle_to_pwm(180 - angles[i][1] + br1_calibValue)
+            set_pwm(bus, 14, 0, pwm_value1)
 
-        if shift_index == 3:    
-            draw_Leg([750,0], 151.5, 136.5,  -90 - angles[i - shift][1], 180- angles[i - shift][2], 2, 0)
-        else:
-            draw_Leg([750,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
+            pwm_value2 = angle_to_pwm(angles[i][2] + br2_calibValue)
+            set_pwm(bus, 15, 0, pwm_value2)
+
+
+            #fl
+            pwm_value3 = angle_to_pwm(angles[i][0] + 5)
+            set_pwm(bus, 4, 0, pwm_value3)
+
+            pwm_value4 = angle_to_pwm(angles[i][1] + 0)
+            set_pwm(bus, 5, 0, pwm_value4)
+
+            pwm_value5 = angle_to_pwm(180 - angles[i][2] + 0)
+            set_pwm(bus, 6, 0, pwm_value5)
+
+            #fr
+            pwm_value6 = angle_to_pwm(angles[i - shift][2] + 0)
+            set_pwm(bus, 0, 0, pwm_value6)
+
+            pwm_value7 = angle_to_pwm(180 - angles[i - shift][1] + 0)
+            set_pwm(bus, 1, 0, pwm_value7)
+
+            pwm_value8 = angle_to_pwm(180 - angles[i - shift][0] + 0)
+            set_pwm(bus, 2, 0, pwm_value8)
+
+            #bl
+            pwm_value9 = angle_to_pwm(180 -angles[i - shift][0] + 10)
+            set_pwm(bus, 11, 0, pwm_value9)
+
+            pwm_value10 = angle_to_pwm(angles[i - shift][1] + 0)
+            set_pwm(bus, 10, 0, pwm_value10)
+
+            pwm_value11 = angle_to_pwm(180 - angles[i - shift][2] + 0)
+            set_pwm(bus, 9, 0, pwm_value11)
+
+#
+        #if shift_index == 5:    
+        #    draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i - shift][1], 180- angles[i - shift][2], 1, 0)
+        #else:
+        #    draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 0)
+#
+        #
+        #if shift_index == 5:
+        #    draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i- shift][1], 180- angles[i- shift][2], 2, 0)
+        #else:
+        #    draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
+#
+        #if shift_index == 3:    
+        #    draw_Leg([750,0], 151.5, 136.5,  -90 - angles[i - shift][1], 180- angles[i - shift][2], 2, 0)
+        #else:
+        #    draw_Leg([750,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
 
         #draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
         #draw_Leg([750,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i - shift][2], 2, 0)
-        plt.pause(delay)
-
+        #plt.pause(delay)
+        sleep(delay)
 
 def calcInvKin(X, Y, Z):
     lengthD = np.sqrt((np.sqrt(Z ** 2 + Y ** 2) ** 2) - (lengthA ** 2))
@@ -244,15 +323,20 @@ for i in range(1, len(jointAngles)):
 
 #print(jointAngles_interpArray.shape)
 print(len(jointAngles_interpArray))
-for i in range(5): 
+for i in range(10): 
     sendFrame_shift(jointAngles_interpArray, len(jointAngles_interpArray) // 2, 5, 3)
 
-
-
-
-#draw_Leg([0,0], 151.5, 136.5,  -90 - 25, 180- 30)
-
-
-#draw_Leg([0,0], 151.5, 136.5, -90- 45, 180- 45)
-
-plt.show()
+# Initialize I2C
+#with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
+#    set_pwm_freq(bus, FREQ)
+#    
+#    # Set servo to 90° on channel 0
+#    pwm_value = angle_to_pwm(45)
+#    set_pwm(bus, 15, 0, pwm_value)
+#    sleep(0.5)
+#    pwm_value = angle_to_pwm(90)
+#    set_pwm(bus, 15, 0, pwm_value)
+#    
+#    print(f"Set servo to 90°, PWM: {pwm_value}")
+#
+#plt.show()
