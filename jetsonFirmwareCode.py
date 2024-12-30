@@ -25,7 +25,7 @@ lengthF = 136.5
 #               [90.0, 27.4, 91.3],
 #               [90.0, 10.1, 101.7]]
 
-jointAngles = [
+jointAngles1 = [
     [90.0, 10.1, 101.7],
     [90.0, 27.4, 91.3],
     [90.0, 43.0, 87.8],
@@ -39,6 +39,22 @@ jointAngles = [
     [90.0, 18.2, 80.7],
     [90.0, 11.2, 92.6],
     [90.0, 10.1, 101.7]
+]
+
+jointAngles = [
+    [90, 27.4, 91.3],
+    [90, 35.5, 88.7],
+    [90, 43.0, 87.8],
+    [90, 49.7, 88.7],
+    [90, 55.5, 91.3],
+    [90, 62.7, 82.3],
+    [90, 66.2, 73.3],
+    [90, 64.7, 64.6],
+    [90, 55.7, 57.9],
+    [90, 41.3, 64.6],
+    [90, 32.5, 73.3],
+    [90, 28.3, 82.2],
+    [90, 27.4, 91.3],
 ]
 
 jointAngles_interpArray = np.empty((0,3))
@@ -141,13 +157,13 @@ def sendFrame_shift(angles, shift, shift_index, time):
         else:
             draw_Leg([0,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 1)
 
-        if shift_index == 1:    
+        if shift_index == 5:    
             draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i - shift][1], 180- angles[i - shift][2], 1, 0)
         else:
             draw_Leg([250,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 1, 0)
 
         
-        if shift_index == 2:
+        if shift_index == 5:
             draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i- shift][1], 180- angles[i- shift][2], 2, 0)
         else:
             draw_Leg([500,0], 151.5, 136.5,  -90 - angles[i][1], 180- angles[i][2], 2, 0)
@@ -196,8 +212,8 @@ for i in range(1, len(jointAngles)):
     jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
 
 #print(jointAngles_interpArray.shape)
-for i in range(4): 
-    sendFrame_shift(jointAngles_interpArray, 60, i, 5000)
+for i in range(5): 
+    sendFrame_shift(jointAngles_interpArray, 60, 5, 8000)
 
 
 
