@@ -1,0 +1,10 @@
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Debug\GUIHERO.exe.config
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Debug\GUIHERO.exe
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Debug\GUIHERO.pdb
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.AssemblyReference.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.Properties.Resources.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.GenerateResource.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.CoreCompileInputs.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.exe
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.pdb
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.GUI.resources

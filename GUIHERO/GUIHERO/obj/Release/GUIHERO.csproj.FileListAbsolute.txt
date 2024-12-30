@@ -1,0 +1,14 @@
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Release\GUIHERO.exe.config
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Release\GUIHERO.exe
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\bin\Release\GUIHERO.pdb
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.csproj.AssemblyReference.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.GUI.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.Properties.Resources.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.csproj.GenerateResource.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.csproj.CoreCompileInputs.cache
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.exe
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.pdb
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.Debuggen.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.GPS.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.Kommunikation.resources
+C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Release\GUIHERO.Manuelle_Funktionen.resources
