@@ -214,6 +214,10 @@ def makeFramesArray(targetPoints, currentPoints, totalMoveTime):
     steps = totalMoveTime // UPDATE_INTERVAL_MS
     pointIntervals = [0, 0, 0]
 
+    if len(targetPoints) != 3 or len(currentPoints) != 3:
+        raise ValueError("targetPoints and currentPoints must each contain exactly 3 elements.")
+
+
     for i in range(3):
         pointIntervals[i] = (targetPoints[i] - currentPoints[i]) * (1.0 / steps)
 
@@ -329,20 +333,23 @@ def calcInvKin(X, Y, Z):
 
 def stand_up():
     startCords = calcInvKin(0, 100, 35.7)
-    endCords = calcInvKin(0, 200, 35.7)
+    midCords = calcInvKin(0, 190, 35.7)
+    endCords = calcInvKin(0,200,35.7)
 
-    for i in range(4):
-        moveLeg(startCords[0], startCords[1], startCords[2], i)
+    #for i in range(4):
+    #    moveLeg(startCords[0], startCords[1], startCords[2], i)
     
-    standUp_Array = makeFramesArray(endCords, startCords, 1000)
+    standUp_Array = makeFramesArray(midCords[0], startCords[0], 100)
+    standUp_Array = np.vstack((standUp_Array, makeFramesArray(endCords[0], midCords[0], 200)))
 
     for j in range(len(standUp_Array)):
         for l in range(4):
             #moveLeg(standUp_Array[0], standUp_Array[1], standUp_Array[2], l)
-            print()
+            x = 1+1
         
         draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
-        sleep(1/len(standUp_Array))
+        plt.pause(0.001)
+
 
     plt.show()
 
@@ -358,10 +365,10 @@ def start_server():
         conn, addr = server_socket.accept()
         print(f"Connection established with {addr}")
         threading.Thread(target=receive_thread, args=(conn,)).start()
-
-        while True:
-            message = "test"
-            conn.sendall(message.encode('utf-8'))
+        plt.show()
+        #while True:
+        #    message = "test"
+        #    conn.sendall(message.encode('utf-8'))
 
 
 #jointAngles = [[90.0, 10.1, 101.7],
@@ -475,5 +482,8 @@ for i in range(1, len(jointAngles)):
 #    print(f"Set servo to 90°, PWM: {pwm_value}")
 #
 
-if __name__ == "__main__":
-    start_server()
+stand_up()
+plt.show()
+
+#if __name__ == "__main__":
+#    start_server()
