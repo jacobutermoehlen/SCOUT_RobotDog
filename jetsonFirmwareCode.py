@@ -344,6 +344,8 @@ def stand_up():
         draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
         sleep(1/len(standUp_Array))
 
+    plt.show()
+
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -472,7 +474,6 @@ for i in range(1, len(jointAngles)):
 #    
 #    print(f"Set servo to 90°, PWM: {pwm_value}")
 #
-#plt.show()
 
 if __name__ == "__main__":
     start_server()
