@@ -255,6 +255,7 @@ def calcInvKin(X, Y, Z):
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((server_ip, server_port))
     server_socket.listen(1)
     print(f"Server listening on {server_ip}:{server_port}")
@@ -263,6 +264,10 @@ def start_server():
         conn, addr = server_socket.accept()
         print(f"Connection established with {addr}")
         threading.Thread(target=receive_thread, args=(conn,)).start()
+
+        while True:
+            message = "test"
+            conn.sendall(message.encode('utf-8'))
 
 
 #jointAngles = [[90.0, 10.1, 101.7],
@@ -359,7 +364,7 @@ for i in range(1, len(jointAngles)):
 
 #print(jointAngles_interpArray.shape)
 print(len(jointAngles_interpArray))
-for i in range(10): 
+for i in range(0): 
     sendFrame_shift(jointAngles_interpArray, len(jointAngles_interpArray) // 2, 5, 3)
 
 # Initialize I2C
@@ -376,3 +381,6 @@ for i in range(10):
 #    print(f"Set servo to 90°, PWM: {pwm_value}")
 #
 #plt.show()
+
+if __name__ == "__main__":
+    start_server()
