@@ -3,6 +3,13 @@ import numpy as np
 from time import sleep
 from array import *
 from smbus2 import SMBus
+import socket
+import threading
+
+#TCP Socket Setup
+server_ip = '192.168.4.1'
+server_port = 12345
+
 
 # variables
 UPDATE_INTERVAL_MS = 10
@@ -26,6 +33,26 @@ br2_calibValue = 0
 br0 = 13
 br1 = 14
 br2 = 15
+
+def handle_message(message, conn):
+    if message == 'test123456789':
+        print("Client said test123456789")
+        conn.sendall(b"Hello, Client")
+    else:
+        print(f"Received message: {message}")
+
+def receive_thread(conn):
+    while True:
+        try:
+            data = conn.recv(1024).decode('utf-8')
+            if not data:
+                break
+            handle_message(data, conn)
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+    print("Connection closed.")
+    conn.close()
 
 def set_pwm_freq(bus, freq_hz):
     prescale_val = int(25000000.0 / (4096 * freq_hz) - 1)
@@ -226,7 +253,16 @@ def calcInvKin(X, Y, Z):
 
     return np.column_stack((omega, theta, phi))
 
+def start_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((server_ip, server_port))
+    server_socket.listen(1)
+    print(f"Server listening on {server_ip}:{server_port}")
 
+    while True:
+        conn, addr = server_socket.accept()
+        print(f"Connection established with {addr}")
+        threading.Thread(target=receive_thread, args=(conn,)).start()
 
 
 #jointAngles = [[90.0, 10.1, 101.7],
