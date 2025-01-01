@@ -8,3 +8,17 @@ C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.CoreCompile
 C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.exe
 C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.pdb
 C:\Users\dgr8n\source\repos\GUIHERO\GUIHERO\obj\Debug\GUIHERO.GUI.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\bin\Debug\GUIHERO.exe.config
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\bin\Debug\GUIHERO.exe
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\bin\Debug\GUIHERO.pdb
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.AssemblyReference.cache
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.Debuggen.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.GPS.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.GUI.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.Kommunikation.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.Manuelle_Funktionen.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.Properties.Resources.resources
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.GenerateResource.cache
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.csproj.CoreCompileInputs.cache
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.exe
+C:\Users\Jacob\Documents\HERO_RobotDog\GUIHERO\GUIHERO\obj\Debug\GUIHERO.pdb
