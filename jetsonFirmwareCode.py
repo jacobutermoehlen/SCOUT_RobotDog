@@ -27,17 +27,44 @@ lengthE = 151.5
 lengthF = 136.5
 
 # constants for servo index
-br0_calibValue = 10
-br1_calibValue = 0
-br2_calibValue = 0
+fl0 = 4
+fl1 = 5
+fl2 = 6
+
+fr0 = 2
+fr1 = 1
+fr2 = 0
+
+bl0 = 11
+bl1 = 10
+bl2 = 9
+
 br0 = 13
 br1 = 14
 br2 = 15
+    #calibration values
+fl0_calibValue = 0
+fl1_calibValue = 0
+fl2_calibValue = 0
+
+fr0_calibValue = 0
+fr1_calibValue = 0
+fr2_calibValue = 0
+
+bl0_calibValue = 0
+bl1_calibValue = 0
+bl2_calibValue = 0
+
+br0_calibValue = 10
+br1_calibValue = 0
+br2_calibValue = 0
 
 def handle_message(message, conn):
     if message == 'test123456789':
         print("Client said test123456789")
         conn.sendall(b"Hello, Client")
+    elif message == 'standup':
+        stand_up()
     else:
         print(f"Received message: {message}")
 
@@ -130,11 +157,58 @@ def sendFrame(targetPoints, currentPoints, totalMoveTime, phase_shift):
     currentPoints[2] = jointArray[2]
     print()
 
-def moveLeg(points, totalMoveTime):
+def moveLeg_WCycle(points, totalMoveTime):
     currentPoints = jointAngles[0]
     
     for i in range(1,len(points)):
         sendFrame(points[i], currentPoints, totalMoveTime, 5)
+
+def moveLeg(angle0, angle1, angle2, index):
+    
+    with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
+        set_pwm_freq(bus, FREQ)
+
+        #Decide which leg to move
+        if index == 0:
+            
+            pwm_value0 = angle_to_pwm(angle0 + fl0_calibValue)
+            set_pwm(bus, fl0, 0, pwm_value0)                    # move 1st servo of front left leg
+
+            pwm_value1 = angle_to_pwm(angle1 + fl1_calibValue)
+            set_pwm(bus, fl1, 0, pwm_value1)                    # move 2nd servo of front left leg
+
+            pwm_value2 = angle_to_pwm(angle2 + fl2_calibValue)
+            set_pwm(bus, fl2, 0, pwm_value2)                    # move 3rd servo of front left leg
+
+        elif index == 1:
+            
+            pwm_value0 = angle_to_pwm(angle0 + fr0_calibValue)
+            set_pwm(bus, fr0, 0, pwm_value0)                    # move 1st servo of front right leg
+
+            pwm_value1 = angle_to_pwm(angle1 + fr1_calibValue)
+            set_pwm(bus, fr1, 0, pwm_value1)                    # move 2nd servo of front right leg
+
+            pwm_value2 = angle_to_pwm(angle2 + fr2_calibValue)
+            set_pwm(bus, fr2, 0, pwm_value2)                    # move 3rd servo of fron right leg
+
+        elif index == 2:
+            
+            pwm_value0 = angle_to_pwm(angle0 + bl0_calibValue)
+            set_pwm(bus, bl0, 0, pwm_value0)                    # move 1st servo of back left leg
+
+            pwm_value1 = angle_to_pwm(angle1 + bl1_calibValue)
+            set_pwm(bus, bl1, 0, pwm_value1)                    # move 2nd servo of back left leg
+
+            pwm_value2 = angle_to_pwm(angle2 + bl2_calibValue)
+            set_pwm(bus, bl2, 0, pwm_value2)                    # move 3rd servo of back left leg
+
+        elif index == 3:
+            
+            pwm_value0 = angle_to_pwm(angle0 + br0_calibValue)
+            set_pwm(bus, br0, 0, pwm_value0)                    # move 1st servo of back right leg
+
+            pwm_value1 = angle_to_pwm(angle1 + br1_calibValue)
+    
 
 def makeFramesArray(targetPoints, currentPoints, totalMoveTime):
     steps = totalMoveTime // UPDATE_INTERVAL_MS
@@ -253,6 +327,24 @@ def calcInvKin(X, Y, Z):
 
     return np.column_stack((omega, theta, phi))
 
+def stand_up():
+    startCords = calcInvKin(0, 100, 35.7)
+    endCords = calcInvKin(0, 200, 35.7)
+
+    for i in range(4):
+        moveLeg(startCords[0], startCords[1], startCords[2], i)
+    
+    standUp_Array = makeFramesArray(endCords, startCords, 1000)
+
+    for j in range(len(standUp_Array)):
+        for l in range(4):
+            #moveLeg(standUp_Array[0], standUp_Array[1], standUp_Array[2], l)
+            print()
+        
+        draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
+        sleep(1/len(standUp_Array))
+
+
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -363,9 +455,9 @@ for i in range(1, len(jointAngles)):
     jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
 
 #print(jointAngles_interpArray.shape)
-print(len(jointAngles_interpArray))
-for i in range(0): 
-    sendFrame_shift(jointAngles_interpArray, len(jointAngles_interpArray) // 2, 5, 3)
+#print(len(jointAngles_interpArray))
+#for i in range(0): 
+#    sendFrame_shift(jointAngles_interpArray, len(jointAngles_interpArray) // 2, 5, 3)
 
 # Initialize I2C
 #with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
