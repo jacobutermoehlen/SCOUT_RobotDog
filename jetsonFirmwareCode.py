@@ -13,6 +13,14 @@ server_port = 12345
 
 # variables
 UPDATE_INTERVAL_MS = 10
+ride_height = 200
+
+# cycle preset 1
+P0_1 = np.array([-50, ride_height, 35.7])
+P1_1 = np.array([-75, ride_height - 40, 35.7])
+P2_1 = np.array([0, ride_height - 60, 35.7])
+P3_1 = np.array([75, ride_height - 40, 35.7])
+P4_1 = np.array([50, ride_height, 35.7])
 
 # Constants
 PCA9685_ADDRESS = 0x40  # Default I2C address
@@ -65,6 +73,15 @@ def handle_message(message, conn):
         conn.sendall(b"Hello, Client")
     elif message == 'standup':
         stand_up()
+    elif "moveN" in message:
+        print(message[5:])
+        conn.sendall("Moved".encode('utf-8'))
+    elif "moveForward" in message:
+        print(message[11:])
+    elif "makeInterpArray" in message:
+        make_interp_array
+    elif "turnLeft" in message:
+        print()
     else:
         print(f"Received message: {message}")
 
@@ -177,15 +194,15 @@ def moveLeg(angle0, angle1, angle2, index):
             pwm_value1 = angle_to_pwm(angle1 + fl1_calibValue)
             set_pwm(bus, fl1, 0, pwm_value1)                    # move 2nd servo of front left leg
 
-            pwm_value2 = angle_to_pwm(angle2 + fl2_calibValue)
+            pwm_value2 = angle_to_pwm(180 - angle2 + fl2_calibValue)
             set_pwm(bus, fl2, 0, pwm_value2)                    # move 3rd servo of front left leg
 
         elif index == 1:
             
-            pwm_value0 = angle_to_pwm(angle0 + fr0_calibValue)
+            pwm_value0 = angle_to_pwm(180 - angle0 + fr0_calibValue)
             set_pwm(bus, fr0, 0, pwm_value0)                    # move 1st servo of front right leg
 
-            pwm_value1 = angle_to_pwm(angle1 + fr1_calibValue)
+            pwm_value1 = angle_to_pwm(180 - angle1 + fr1_calibValue)
             set_pwm(bus, fr1, 0, pwm_value1)                    # move 2nd servo of front right leg
 
             pwm_value2 = angle_to_pwm(angle2 + fr2_calibValue)
@@ -193,13 +210,13 @@ def moveLeg(angle0, angle1, angle2, index):
 
         elif index == 2:
             
-            pwm_value0 = angle_to_pwm(angle0 + bl0_calibValue)
+            pwm_value0 = angle_to_pwm(180 - angle0 + bl0_calibValue)
             set_pwm(bus, bl0, 0, pwm_value0)                    # move 1st servo of back left leg
 
             pwm_value1 = angle_to_pwm(angle1 + bl1_calibValue)
             set_pwm(bus, bl1, 0, pwm_value1)                    # move 2nd servo of back left leg
 
-            pwm_value2 = angle_to_pwm(angle2 + bl2_calibValue)
+            pwm_value2 = angle_to_pwm(190 - angle2 + bl2_calibValue)
             set_pwm(bus, bl2, 0, pwm_value2)                    # move 3rd servo of back left leg
 
         elif index == 3:
@@ -207,8 +224,11 @@ def moveLeg(angle0, angle1, angle2, index):
             pwm_value0 = angle_to_pwm(angle0 + br0_calibValue)
             set_pwm(bus, br0, 0, pwm_value0)                    # move 1st servo of back right leg
 
-            pwm_value1 = angle_to_pwm(angle1 + br1_calibValue)
-    
+            pwm_value1 = angle_to_pwm(180 - angle1 + br1_calibValue)
+            set_pwm(bus, br1, 0, pwm_value1)                    # move 2nd servo of back right leg
+
+            pwm_value2 = angle_to_pwm(angle2 + br2_calibValue)
+            set_pwm(bus, br2, 0, pwm_value2)    
 
 def makeFramesArray(targetPoints, currentPoints, totalMoveTime):
     steps = totalMoveTime // UPDATE_INTERVAL_MS
@@ -249,7 +269,7 @@ def sendFrame_shift(angles, shift, shift_index, time):
 
         with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
             set_pwm_freq(bus, FREQ)
-    
+
             #br
             pwm_value0 = angle_to_pwm(angles[i][0] + br0_calibValue)
             set_pwm(bus, 13, 0, pwm_value0)
@@ -331,6 +351,57 @@ def calcInvKin(X, Y, Z):
 
     return np.column_stack((omega, theta, phi))
 
+def calcWalkCycle5(P0, P1, P2, P3, P4, bezierCurve_count, flatPoints_count, alpha):
+    points_inOrder = np.empty((0,3))
+    t = np.linspace(0, 1, bezierCurve_count)
+
+    # Calculate Bezier Curve Points
+    x1 = ((1 - t) ** 2 * P0[0]) + 2 * (1 - t) * t * P1[0] + t ** 2 * P2[0]
+    y1 = ((1 - t) ** 2 * P0[1]) + 2 * (1 - t) * t * P1[1] + t ** 2 * P2[1]
+    z1 = np.full_like(t, P2[2])
+
+    x2 = ((1 - t) ** 2 * P4[0]) + 2 * (1 - t) * t * P3[0] + t ** 2 * P2[0]
+    y2 = ((1 - t) ** 2 * P4[1]) + 2 * (1 - t) * t * P3[1] + t ** 2 * P2[1]
+    z2 = z1
+
+    # Generate flat Points
+    fx = np.linspace(P0[0], P4[0], flatPoints_count)
+    fy = np.full_like(fx, P0[1])
+    fz = np.full_like(fx, P0[2])
+
+
+    # rotate around x = 0 by angle alpha
+    alpha_radi = np.radians(alpha)
+
+    x1_rotated = np.cos(alpha_radi) * x1
+    z1_rotated = np.sin(alpha_radi) * x1 + z1
+
+    x2_rotated = np.cos(alpha_radi) * x2
+    z2_rotated = np.sin(alpha_radi) * x2 + z2
+
+    fx_rotated = np.cos(alpha_radi) * fx
+    fz_rotated = np.sin(alpha_radi) * fx + fz
+
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((fx_rotated, fy, fz_rotated))))
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((x2_rotated[1:], y2[1:], z2_rotated[1:]))))
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((np.flipud(x1_rotated[:-1]), np.flipud(y1[:-1]), np.flipud(z1_rotated[:-1])))))
+    
+    jointAngles = np.round(calcInvKin(points_inOrder[:, 0], points_inOrder[:, 1], points_inOrder[:, 2]), 1)
+
+
+    jointAngles_interpArray = np.empty((0,3))
+    currentPoints = jointAngles[0]
+
+    for i in range(1, len(jointAngles)):
+        # Get the interpolated matrix for the current segment
+        interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
+
+        # Stack it to the final matrix
+        jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
+    print(points_inOrder)
+    return jointAngles_interpArray
+
+# functions for movement
 def stand_up():
     startCords = calcInvKin(0, 100, 35.7)
     midCords = calcInvKin(0, 190, 35.7)
@@ -344,14 +415,81 @@ def stand_up():
 
     for j in range(len(standUp_Array)):
         for l in range(4):
-            #moveLeg(standUp_Array[0], standUp_Array[1], standUp_Array[2], l)
-            x = 1+1
+            moveLeg(standUp_Array[0], standUp_Array[1], standUp_Array[2], l)
         
         draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
         plt.pause(0.001)
 
 
     plt.show()
+
+def move_to_neutral(height):
+    neutralCords = calcInvKin(0, height, 35.7)[0]       # calc. Inverse Kinematics for neutral position for specific height
+
+    for l in range(4):                                                  
+        moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], l)   #move each leg to neutral position to height
+
+def make_interp_array():
+    points_inOrder = np.empty((0,3))
+    bezierCurvePoint_Count = 5
+    t = np.linspace(0,1, bezierCurvePoint_Count)
+
+    # Define control points
+    P0 = np.array([-50, 200])
+    P1 = np.array([-75, 160])
+    P2 = np.array([0, 140])
+    P3 = np.array([75, 160])
+    P4 = np.array([50, 200])
+
+    # Calculate Bezier Curves points
+    x1 = ((1 - t) ** 2 * P0[0]) + 2 * (1 - t) * t * P1[0] + t ** 2 * P2[0]
+    y1 = ((1 - t) ** 2 * P0[1]) + 2 * (1 - t) * t * P1[1] + t ** 2 * P2[1]
+
+    x2 = ((1 - t) ** 2 * P4[0]) + 2 * (1 - t) * t * P3[0] + t ** 2 * P2[0]
+    y2 = ((1 - t) ** 2 * P4[1]) + 2 * (1 - t) * t * P3[1] + t ** 2 * P2[1]
+
+    # Generate flat points
+    f = np.linspace(P0[0], P4[0], bezierCurvePoint_Count)
+
+    # Combine points into points_inOrder
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((f, np.full_like(f, 200), np.full_like(f, lengthA)))))
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((x2[1:], y2[1:], np.full_like(y2[1:], lengthA)))))
+    points_inOrder = np.vstack((points_inOrder, np.column_stack((np.flipud(x1[:-1]), np.flipud(y1[:-1]), np.full_like(y1[:-1], lengthA)))))
+
+    jointAngles = np.round(calcInvKin(points_inOrder[:, 0], points_inOrder[:, 1], points_inOrder[:, 2]), 1)
+
+
+    jointAngles_interpArray = np.empty((0,3))
+    currentPoints = jointAngles[0]
+
+    for i in range(1, len(jointAngles)):
+        # Get the interpolated matrix for the current segment
+        interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
+
+        # Stack it to the final matrix
+        jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
+
+def move_forward(reps, time, angle):
+
+    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 5, angle)    #for fl leg [0]
+    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 5, -angle)   #for fr leg [1]
+    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 5, 0)
+
+    print(jointAngles_interpArray0)
+
+    shift = len(jointAngles_interpArray0) // 2
+    delay = time / reps / len(jointAngles_interpArray0)
+
+    for i in range(reps):
+        for j in range(len(jointAngles_interpArray0)):
+            moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0)                          #move front-left leg
+
+            moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 1)  #move front-right leg
+
+            moveLeg(jointAngles_interpArray2_3[j - shift][0], jointAngles_interpArray2_3[j - shift][1], jointAngles_interpArray2_3[j - shift][2], 2)  #move back-left leg
+
+            moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3)                          #move back-right leg
+            sleep(delay)
 
 
 def start_server():
@@ -371,19 +509,19 @@ def start_server():
         #    conn.sendall(message.encode('utf-8'))
 
 
-#jointAngles = [[90.0, 10.1, 101.7],
-#               [90.0, 11.2, 92.6],
-#               [90.0, 18.2, 80.7],
-#               [90.0, 32.5, 67.4],
-#               [90.0, 55.7, 57.9],
-#               [90.0, 71.2, 67.4],
-#               [90.0, 74.1, 80.7],
-#               [90.0, 70.5, 92.6],
-#               [90.0, 63.3, 101.7],
-#               [90.0, 55.5, 91.3],
-#               [90.0, 43.0, 87.8],
-#               [90.0, 27.4, 91.3],
-#               [90.0, 10.1, 101.7]]
+jointAngles0 = [[90.0, 10.1, 101.7],
+               [90.0, 11.2, 92.6],
+               [90.0, 18.2, 80.7],
+               [90.0, 32.5, 67.4],
+               [90.0, 55.7, 57.9],
+               [90.0, 71.2, 67.4],
+               [90.0, 74.1, 80.7],
+               [90.0, 70.5, 92.6],
+               [90.0, 63.3, 101.7],
+               [90.0, 55.5, 91.3],
+               [90.0, 43.0, 87.8],
+               [90.0, 27.4, 91.3],
+               [90.0, 10.1, 101.7]]
 
 jointAngles1 = [
     [90.0, 10.1, 101.7],
@@ -417,55 +555,18 @@ jointAngles2 = [
     [90, 27.4, 91.3],
 ]
 
-points_inOrder = np.empty((0,3))
-bezierCurvePoint_Count = 5
-t = np.linspace(0,1, bezierCurvePoint_Count)
-
-# Define control points
-P0 = np.array([-50, 200])
-P1 = np.array([-75, 160])
-P2 = np.array([0, 140])
-P3 = np.array([75, 160])
-P5 = np.array([50, 200])
-
-# Calculate Bezier Curves points
-x1 = ((1 - t) ** 2 * P0[0]) + 2 * (1 - t) * t * P1[0] + t ** 2 * P2[0]
-y1 = ((1 - t) ** 2 * P0[1]) + 2 * (1 - t) * t * P1[1] + t ** 2 * P2[1]
-
-x2 = ((1 - t) ** 2 * P5[0]) + 2 * (1 - t) * t * P3[0] + t ** 2 * P2[0]
-y2 = ((1 - t) ** 2 * P5[1]) + 2 * (1 - t) * t * P3[1] + t ** 2 * P2[1]
-
-# Generate flat points
-f = np.linspace(P0[0], P5[0], bezierCurvePoint_Count)
-
-# Combine points into points_inOrder
-points_inOrder = np.vstack((points_inOrder, np.column_stack((f, np.full_like(f, 200), np.full_like(f, lengthA)))))
-points_inOrder = np.vstack((points_inOrder, np.column_stack((x2[1:], y2[1:], np.full_like(y2[1:], lengthA)))))
-points_inOrder = np.vstack((points_inOrder, np.column_stack((np.flipud(x1[:-1]), np.flipud(y1[:-1]), np.full_like(y1[:-1], lengthA)))))
-
-jointAngles = np.round(calcInvKin(points_inOrder[:, 0], points_inOrder[:, 1], points_inOrder[:, 2]), 1)
-
-
-
-jointAngles_interpArray = np.empty((0,3))
-currentPoints = jointAngles[0]
 
 fig, ax = plt.subplots(figsize=(6,6))
 
-
-#moveLeg(jointAngles, 100)
-currentPoints = jointAngles[0]
     
-for i in range(1, len(jointAngles)):
-    # Get the interpolated matrix for the current segment
-    interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
-
-    # Stack it to the final matrix
-    jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
-
-#print(jointAngles_interpArray.shape)
-#print(len(jointAngles_interpArray))
-#for i in range(0): 
+#for i in range(1, len(jointAngles)):
+#    # Get the interpolated matrix for the current segment
+#    interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
+#
+#    # Stack it to the final matrix
+#    jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
+#
+##for i in range(0): 
 #    sendFrame_shift(jointAngles_interpArray, len(jointAngles_interpArray) // 2, 5, 3)
 
 # Initialize I2C
@@ -481,9 +582,8 @@ for i in range(1, len(jointAngles)):
 #    
 #    print(f"Set servo to 90°, PWM: {pwm_value}")
 #
-
-stand_up()
 plt.show()
 
-#if __name__ == "__main__":
-#    start_server()
+if __name__ == "__main__":
+    jointAngles_interpArray = np.empty((0,3))
+    start_server()
