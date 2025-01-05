@@ -1,0 +1,74 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\hero_gui\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|solutionrelative:hero_gui\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\hero_gui\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|solutionrelative:hero_gui\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\hero_gui\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{3C777A6E-8074-41A2-82F3-1A903CDC813C}|HERO_GUI\\HERO_GUI.csproj|solutionrelative:hero_gui\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e506b91c-c606-466a-90a9-123d1d1e12b3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "App.config",
+              "DocumentMoniker": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\App.config",
+              "RelativeDocumentMoniker": "HERO_GUI\\App.config",
+              "ToolTip": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\App.config",
+              "RelativeToolTip": "HERO_GUI\\App.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2025-01-05T11:40:22.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "HERO_GUI\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml*",
+              "RelativeToolTip": "HERO_GUI\\MainWindow.xaml*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-01-05T10:37:40.197Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "HERO_GUI\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml.cs",
+              "RelativeToolTip": "HERO_GUI\\MainWindow.xaml.cs",
+              "ViewState": "AgIAADAAAAAAAAAAAAAowE0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-05T10:37:39.694Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
