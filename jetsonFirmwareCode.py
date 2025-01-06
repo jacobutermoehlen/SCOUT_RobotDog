@@ -52,20 +52,20 @@ br1 = 14
 br2 = 15
     #calibration values
 fl0_calibValue = 0
-fl1_calibValue = 0
-fl2_calibValue = 0
+fl1_calibValue = 10.5
+fl2_calibValue = -5
 
-fr0_calibValue = 0
-fr1_calibValue = 0
-fr2_calibValue = 0
+fr0_calibValue = 5
+fr1_calibValue = -6
+fr2_calibValue = -2.5
 
-bl0_calibValue = 0
-bl1_calibValue = 0
-bl2_calibValue = 0
+bl0_calibValue = 13
+bl1_calibValue = -3.2
+bl2_calibValue = -4
 
-br0_calibValue = 10
-br1_calibValue = 0
-br2_calibValue = 0
+br0_calibValue = 13
+br1_calibValue = -3.5
+br2_calibValue = 2
 
 def handle_message(message, conn):
     if message == 'test123456789':
@@ -75,9 +75,14 @@ def handle_message(message, conn):
         stand_up()
     elif "moveN" in message:
         print(message[5:])
+        move_to_neutral(message[5:])
         conn.sendall("Moved".encode('utf-8'))
     elif "moveForward" in message:
         print(message[11:])
+        print("moving forward")
+        move_forward(2, 5, 0)
+    elif "standUp" in message:
+        stand_up()
     elif "makeInterpArray" in message:
         make_interp_array
     elif "turnLeft" in message:
@@ -110,12 +115,16 @@ def set_pwm(bus, channel, on, off):
     bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel + 2, off & 0xFF)
     bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L + 4 * channel + 3, off >> 8)
 
-def angle_to_pwm(angle):
-    # Map 0°-180° to ~205-410
-    min_pwm = 100
-    max_pwm = 510
-    pulse_length = int(min_pwm + (angle / 180.0) * (max_pwm - min_pwm))
-    return pulse_length
+def angle_to_pwm(angle, min_pwm, max_pwm, freq):
+        # Ensure angle is within bounds
+    angle = max(0, min(180, angle))
+    
+    # Map angle to pulse width in microseconds
+    pulse_width_us = min_pwm + (angle / 180) * (max_pwm - min_pwm)
+    
+    # Convert microseconds to PCA9685 12-bit range
+    pulse_length_counts = int(pulse_width_us * 4096 / (1000000 / freq))
+    return pulse_length_counts
 
 def draw_Leg(base_points, length1, length2, angle1, angle2, colourSet, clear):
 
@@ -183,51 +192,58 @@ def moveLeg_WCycle(points, totalMoveTime):
 def moveLeg(angle0, angle1, angle2, index):
     
     with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
-        set_pwm_freq(bus, FREQ)
-
+        set_pwm_freq(bus,330)
         #Decide which leg to move
         if index == 0:
             
-            pwm_value0 = angle_to_pwm(angle0 + fl0_calibValue)
-            set_pwm(bus, fl0, 0, pwm_value0)                    # move 1st servo of front left leg
-
-            pwm_value1 = angle_to_pwm(angle1 + fl1_calibValue)
+            #set_pwm_freq(bus, 50)
+            #pwm_value0 = angle_to_pwm(angle0 + fl0_calibValue, 100, 510, 50)
+            #set_pwm(bus, fl0, 0, pwm_value0)                    # move 1st servo of front left leg
+#
+            #set_pwm_freq(bus, 330)
+            pwm_value1 = angle_to_pwm(angle1 + fl1_calibValue, 590, 2800, 330)
             set_pwm(bus, fl1, 0, pwm_value1)                    # move 2nd servo of front left leg
 
-            pwm_value2 = angle_to_pwm(180 - angle2 + fl2_calibValue)
+            pwm_value2 = angle_to_pwm(180 - angle2 + fl2_calibValue, 590, 2800, 330)
             set_pwm(bus, fl2, 0, pwm_value2)                    # move 3rd servo of front left leg
 
         elif index == 1:
             
-            pwm_value0 = angle_to_pwm(180 - angle0 + fr0_calibValue)
-            set_pwm(bus, fr0, 0, pwm_value0)                    # move 1st servo of front right leg
+            #set_pwm_freq(bus, 50)
+            #pwm_value0 = angle_to_pwm(180 - angle0 + fr0_calibValue, 100, 510, 50)
+            #set_pwm(bus, fr0, 0, pwm_value0)                    # move 1st servo of front right leg
 
-            pwm_value1 = angle_to_pwm(180 - angle1 + fr1_calibValue)
+            #set_pwm_freq(bus, 330)
+            pwm_value1 = angle_to_pwm(180 - angle1 + fr1_calibValue, 590, 2800, 330)
             set_pwm(bus, fr1, 0, pwm_value1)                    # move 2nd servo of front right leg
 
-            pwm_value2 = angle_to_pwm(angle2 + fr2_calibValue)
+            pwm_value2 = angle_to_pwm(angle2 + fr2_calibValue, 590, 2800, 330)
             set_pwm(bus, fr2, 0, pwm_value2)                    # move 3rd servo of fron right leg
 
         elif index == 2:
             
-            pwm_value0 = angle_to_pwm(180 - angle0 + bl0_calibValue)
-            set_pwm(bus, bl0, 0, pwm_value0)                    # move 1st servo of back left leg
+            #set_pwm_freq(bus, 50)
+            #pwm_value0 = angle_to_pwm(180 - angle0 + bl0_calibValue, 100, 510, 50)
+            #set_pwm(bus, bl0, 0, pwm_value0)                    # move 1st servo of back left leg
 
-            pwm_value1 = angle_to_pwm(angle1 + bl1_calibValue)
+            #set_pwm_freq(bus, 330)
+            pwm_value1 = angle_to_pwm(angle1 + bl1_calibValue, 590, 2800, 330)
             set_pwm(bus, bl1, 0, pwm_value1)                    # move 2nd servo of back left leg
 
-            pwm_value2 = angle_to_pwm(190 - angle2 + bl2_calibValue)
+            pwm_value2 = angle_to_pwm(180 - angle2 + bl2_calibValue, 590, 2800, 330)
             set_pwm(bus, bl2, 0, pwm_value2)                    # move 3rd servo of back left leg
 
         elif index == 3:
             
-            pwm_value0 = angle_to_pwm(angle0 + br0_calibValue)
-            set_pwm(bus, br0, 0, pwm_value0)                    # move 1st servo of back right leg
+            #set_pwm_freq(bus, 50)
+            #pwm_value0 = angle_to_pwm(angle0 + br0_calibValue, 100, 510, 50)
+            #set_pwm(bus, br0, 0, pwm_value0)                    # move 1st servo of back right leg
 
-            pwm_value1 = angle_to_pwm(180 - angle1 + br1_calibValue)
+            #set_pwm_freq(bus, 330)
+            pwm_value1 = angle_to_pwm(180 - angle1 + br1_calibValue, 590, 2800, 330)
             set_pwm(bus, br1, 0, pwm_value1)                    # move 2nd servo of back right leg
 
-            pwm_value2 = angle_to_pwm(angle2 + br2_calibValue)
+            pwm_value2 = angle_to_pwm(angle2 + br2_calibValue, 590, 2800, 330)
             set_pwm(bus, br2, 0, pwm_value2)    
 
 def makeFramesArray(targetPoints, currentPoints, totalMoveTime):
@@ -268,7 +284,7 @@ def sendFrame_shift(angles, shift, shift_index, time):
         #    print(f"{angles[i][1]}  ---  {angles[i][2]}")
 
         with SMBus(7) as bus:  # Use I2C bus 1 on Jetson
-            set_pwm_freq(bus, FREQ)
+            set_pwm_freq(bus, 330)
 
             #br
             pwm_value0 = angle_to_pwm(angles[i][0] + br0_calibValue)
@@ -405,29 +421,34 @@ def calcWalkCycle5(P0, P1, P2, P3, P4, bezierCurve_count, flatPoints_count, alph
 def stand_up():
     startCords = calcInvKin(0, 100, 35.7)
     midCords = calcInvKin(0, 190, 35.7)
-    endCords = calcInvKin(0,200,35.7)
-
-    #for i in range(4):
-    #    moveLeg(startCords[0], startCords[1], startCords[2], i)
-    
+    endCords = calcInvKin(0, 200,35.7)
+    print(startCords.shape)
+    for i in range(4):
+        moveLeg(startCords[0][0], startCords[0][1], startCords[0][2], i)
+    sleep(2)
     standUp_Array = makeFramesArray(midCords[0], startCords[0], 100)
     standUp_Array = np.vstack((standUp_Array, makeFramesArray(endCords[0], midCords[0], 200)))
 
+    print(standUp_Array.shape)
     for j in range(len(standUp_Array)):
         for l in range(4):
-            moveLeg(standUp_Array[0], standUp_Array[1], standUp_Array[2], l)
-        
-        draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
-        plt.pause(0.001)
+            moveLeg(standUp_Array[j][0], standUp_Array[j][1], standUp_Array[j][2], l)
+        sleep(0.1)   
+        #draw_Leg([0,0], 151.5, 136.5,  -90 - standUp_Array[j][1], 180- standUp_Array[j][2], 1, 1)
+        #plt.pause(0.002)
 
 
-    plt.show()
+    #plt.show()
 
 def move_to_neutral(height):
-    neutralCords = calcInvKin(0, height, 35.7)[0]       # calc. Inverse Kinematics for neutral position for specific height
-
-    for l in range(4):                                                  
-        moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], l)   #move each leg to neutral position to height
+    neutralCords = calcInvKin(0, float(height), 35.7)[0]       # calc. Inverse Kinematics for neutral position for specific height
+    print("Calculated Kin")
+    #for l in range(4):                                                  
+    #    moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], l)   #move each leg to neutral position to height
+    moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], 0) 
+    moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], 1)
+    moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], 2) 
+    moveLeg(neutralCords[0], neutralCords[1], neutralCords[2], 3)  
 
 def make_interp_array():
     points_inOrder = np.empty((0,3))
@@ -503,7 +524,7 @@ def start_server():
         conn, addr = server_socket.accept()
         print(f"Connection established with {addr}")
         threading.Thread(target=receive_thread, args=(conn,)).start()
-        plt.show()
+        #plt.show()
         #while True:
         #    message = "test"
         #    conn.sendall(message.encode('utf-8'))
@@ -582,7 +603,7 @@ fig, ax = plt.subplots(figsize=(6,6))
 #    
 #    print(f"Set servo to 90°, PWM: {pwm_value}")
 #
-plt.show()
+#plt.show()
 
 if __name__ == "__main__":
     jointAngles_interpArray = np.empty((0,3))
