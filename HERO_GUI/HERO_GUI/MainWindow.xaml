@@ -9,8 +9,217 @@
 
     <TabControl>
         <TabItem Header="Main Control" x:Name="tab_main">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="0.75*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="2.5*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Column="0" Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Margin="10">
+                    <Grid x:Name="main_cam_grid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3"
+                                   Text="Camera Control" HorizontalAlignment="Center"/>
+                        
+                        <!--Camera Feed Control Buttons-->
+                        <Button x:Name="camLaunch_btn" Grid.Column="0" Grid.Row="1" Content="Launch Feed"
+                                Margin="12" MouseLeftButtonUp="camLaunch_btn_MouseLeftButtonUp"/>
+
+                        <Button x:Name="camStop_btn" Grid.Column="1" Grid.Row="1" Content="Stop Feed"
+                                Margin="12" MouseLeftButtonUp="camStop_btn_MouseLeftButtonUp"/>
+
+                        <!--Camera Settings-->
+                        <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height=".75*"/>
+                                    <RowDefinition Height="1.2*"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Label Content="Camera Settings" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
+                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+                                <StackPanel Grid.Column="0" Grid.Row="1">
+                                    <Label Content="Width" FontSize="13" HorizontalContentAlignment="Center"/>
+                                    <TextBox x:Name="camWidth_box" Text="2560" HorizontalContentAlignment="Center" FontSize="18"
+                                             Margin="5,2"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Grid.Row="1">
+                                    <Label Content="Height" FontSize="13" HorizontalContentAlignment="Center"/>
+                                    <TextBox x:Name="camHeight_box" Text="1440" HorizontalContentAlignment="Center" FontSize="18"
+                                             Margin="5,2"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Label Content="Baudrate" FontSize="13" HorizontalContentAlignment="Center"/>
+                                    <TextBox x:Name="camBaud_box" Text="4000" HorizontalContentAlignment="Center" FontSize="18"
+                                             Margin="5,2"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Grid.Column="2" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="12">
+                            <TextBlock x:Name="cameraRuntime_blk" Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        
+                        <!--Filename for recorded video-->
+                        <TextBox x:Name="camFileName_box" Grid.Column="2" Grid.Row="2" Margin="12" Text="Filename"
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
+                        <Button x:Name="camRec_btn" Grid.Column="1" Grid.Row="2" Content="Start Recording"
+                                Margin="12" MouseLeftButtonUp="camRec_btn_MouseLeftButtonUp"/>
+
+                        <Button x:Name="camStopRec_btn" Grid.Column="1" Grid.Row="3" Content="Stop Recording"
+                                Margin="12" MouseLeftButtonUp="camStopRec_btn_MouseLeftButtonUp"/>
+                        
+                        <!--Canvas for feed status-->
+                        <Canvas x:Name="cam_cnv" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Width="220"
+                                VerticalAlignment="Center" Height="70">
+
+                        </Canvas>
+                    </Grid>
+                </Border>
+                
+                <!--sensor grid-->
+                <Grid Grid.Column="1" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <!-- imu data -->
+                    <Label Content="Orientation" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0"
+                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <Grid Grid.Column="0" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.75*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="X" Grid.Column="0" Grid.Row="0"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBlock x:Name="orientationX_blk" Text="0°" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                    <Grid Grid.Column="1" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.75*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Y" Grid.Column="0" Grid.Row="0"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBlock x:Name="orientationY_blk" Text="0°" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                    <Grid Grid.Column="2" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.75*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Z" Grid.Column="0" Grid.Row="0"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBlock x:Name="orientationZ_blk" Text="0°" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+
+                    <!--Direction-->
+                    <Label Content="Direction" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" BorderBrush="Gray" BorderThickness="0.5"
+                            Margin="10">
+                        <TextBlock x:Name="direction_blk" Text="0° N" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!--temperature-->
+                    <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.75*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Temperature" Grid.Column="0" Grid.Row="0"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Gray" BorderThickness="0.5" Margin="10">
+                            <TextBlock x:Name="temp_blk" Text="20°C" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+
+                    <!--battery voltage-->
+                    <Label Content="Battery Voltage" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
+                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="6" BorderBrush="Gray" BorderThickness="0.5"
+                            Margin="15">
+                        <TextBlock x:Name="batVoltage_blk" Text="0 V" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    
+                    <!--battery level meter-->
+                    <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.7*"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="0%" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Left" 
+                               VerticalContentAlignment="Center"/>
+                        <Label Content="100%" Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Right"
+                               VerticalContentAlignment="Center"/>
+
+                        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" BorderBrush="Gray" BorderThickness="0.75"
+                                Margin="5">
+                            <Canvas x:Name="batLevel_cnv" HorizontalAlignment="Center" Width="500" Height="30">
+                                <Rectangle Fill="Red" Height="30" Width="80" Canvas.Left="0"/>
+                                <Rectangle Fill="Orange" Height="30" Width="120" Canvas.Left="80"/>
+                                <Rectangle Fill="Green" Height="30" Width="300" Canvas.Left="200"/>
+                            </Canvas>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
         </TabItem>
-        
         
         <TabItem Header="Configuration">
             
