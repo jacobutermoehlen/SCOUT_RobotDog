@@ -30,8 +30,8 @@
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml",
               "RelativeDocumentMoniker": "HERO_GUI\\MainWindow.xaml",
-              "ToolTip": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml",
-              "RelativeToolTip": "HERO_GUI\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\Jacob\\Documents\\HERO_RobotDog\\HERO_GUI\\HERO_GUI\\MainWindow.xaml*",
+              "RelativeToolTip": "HERO_GUI\\MainWindow.xaml*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-01-05T10:37:40.197Z",
               "EditorCaption": ""
@@ -46,8 +46,7 @@
               "RelativeToolTip": "HERO_GUI\\MainWindow.xaml.cs",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAABUAAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-05T10:37:39.694Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-05T10:37:39.694Z"
             }
           ]
         }

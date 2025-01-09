@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,15 @@ namespace HERO_GUI
         public MainWindow()
         {
             InitializeComponent();
+
+
+            //Starting Threads
+            Thread tcpReadThread = new Thread(() => tcpReadContin("192.168.4.1", 12345));
+        }
+
+        void MeineMethode(object param)
+        {
+
         }
 
         private void camLaunch_btn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

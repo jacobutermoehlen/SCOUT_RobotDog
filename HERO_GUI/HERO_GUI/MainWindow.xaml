@@ -218,6 +218,81 @@
                         </Border>
                     </Grid>
                 </Grid>
+                
+                <!--control grid-->
+                <Grid x:Name="control_grd" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1.5*"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Column="0" Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Button x:Name="move_forward_btn" Grid.Column="1" Grid.Row="0" Margin="30">
+                                Move Forward
+                            </Button>
+
+                            <Button x:Name="move_stop_btn" Grid.Column="1" Grid.Row="1" Margin="30" Foreground="OrangeRed" >
+                                STOP
+                            </Button>
+
+                            <Button x:Name="move_left_btn" Grid.Column="0" Grid.Row="1" Margin="30">
+                                Move Left
+                            </Button>
+
+                            <Button x:Name="move_right_btn" Grid.Column="2" Grid.Row="1" Margin="30">
+                                Move Right
+                            </Button>
+
+                            <Button x:Name="move_backward_btn" Grid.Column="1" Grid.Row="2" Margin="30">
+                                Move Backward
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="0" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.3*"/>
+                                <ColumnDefinition Width="0.3*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            
+                            <!--velocity slider-->
+                            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch">
+                                <Label Content="Velocity" Margin="10" HorizontalContentAlignment="Center"/>
+                                <Slider x:Name="velocity_sld" Minimum="0" Value="50" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True" 
+                                        Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"/>
+                            </StackPanel>
+                            
+                            <!--ride height slider-->
+                            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch">
+                                <Label Content="Ride Height" Margin="10" HorizontalContentAlignment="Center"/>
+                                <Slider x:Name="height_sld" Minimum="120" Value="200" Maximum="280" TickFrequency="10" IsSnapToTickEnabled="True" 
+                                        Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
         </TabItem>
         
