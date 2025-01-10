@@ -18,20 +18,44 @@ namespace HERO_GUI
 {
     public partial class MainWindow : Window
     {
+        //constants
+        string sensorTCPIp = "192.168.4.1";
+        int sensorTCPPort = 67890;
+        string jetsonTCPIp = "192.168.4.1";
+        int jetsonTCPPort = 12345;
+
+        //variables
+        int velocity = 50;
+        int rideHeigth = 200;
+
         public MainWindow()
         {
             InitializeComponent();
 
 
             //Starting Threads
-            Thread tcpReadThread = new Thread(() => tcpReadContin("192.168.4.1", 12345));
+            Thread tcpSensor_readThread = new Thread(() => tcpSensor_ReadContin(sensorTCPIp, sensorTCPPort));
+
+
         }
 
-        void MeineMethode(object param)
+        //movement control methods
+        private void move_forward_btn_Click(object sender, RoutedEventArgs e)
         {
 
         }
+        private void velocity_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            velocity = (int)velocity_sld.Value;
+        }
 
+        private void height_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            rideHeigth = (int)height_sld.Value;
+        }
+
+
+        //camera control methods
         private void camLaunch_btn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
