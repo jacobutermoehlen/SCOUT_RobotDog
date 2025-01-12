@@ -80,7 +80,7 @@ def handle_message(message, conn):
     elif "moveForward" in message:
         print(message[11:])
         print("moving forward")
-        move_forward(20, 0.5, 0)
+        move_forward(10, 1.5, 0)
     elif "standUp" in message:
         stand_up()
     elif "makeInterpArray" in message:
