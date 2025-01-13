@@ -36,7 +36,6 @@ namespace HERO_GUI
             //Starting Threads
             Thread tcpSensor_readThread = new Thread(() => tcpSensor_ReadContin(sensorTCPIp, sensorTCPPort));
 
-
         }
 
         //movement control methods
