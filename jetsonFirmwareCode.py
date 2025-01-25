@@ -13,14 +13,20 @@ server_port = 12345
 
 # variables
 UPDATE_INTERVAL_MS = 10
-ride_height = 200
+ride_height = 230
 
 # cycle preset 1
-P0_1 = np.array([-50, ride_height, 35.7])
-P1_1 = np.array([-75, ride_height - 40, 35.7])
-P2_1 = np.array([0, ride_height - 60, 35.7])
-P3_1 = np.array([75, ride_height - 40, 35.7])
-P4_1 = np.array([50, ride_height, 35.7])
+#P0_1 = np.array([-50, ride_height, 35.7])
+#P1_1 = np.array([-75, ride_height - 40, 35.7])
+#P2_1 = np.array([0, ride_height - 60, 35.7])
+#P3_1 = np.array([75, ride_height - 40, 35.7])
+#P4_1 = np.array([50, ride_height, 35.7])
+
+P0_1 = np.array([-30, ride_height, 70])
+P1_1 = np.array([-55, ride_height - 40, 70])
+P2_1 = np.array([0, ride_height - 60, 70])
+P3_1 = np.array([55, ride_height - 40, 70])
+P4_1 = np.array([30, ride_height, 70])
 
 # Constants
 PCA9685_ADDRESS = 0x40  # Default I2C address
@@ -43,9 +49,9 @@ fr0 = 2
 fr1 = 1
 fr2 = 0
 
-bl0 = 11
+bl0 = 9
 bl1 = 10
-bl2 = 9
+bl2 = 11
 
 br0 = 13
 br1 = 14
@@ -65,7 +71,7 @@ bl2_calibValue = -4
 
 br0_calibValue = -2.5
 br1_calibValue = -3.5
-br2_calibValue = 2
+br2_calibValue = 1
 
 def handle_message(message, conn):
     if message == 'test123456789':
@@ -80,7 +86,8 @@ def handle_message(message, conn):
     elif "moveForward" in message:
         print(message[11:])
         print("moving forward")
-        move_forward(10, 1.5, 0)
+        move_forward(int(message[11:]), 1, 0)
+        print("Done")
     elif "standUp" in message:
         stand_up()
     elif "makeInterpArray" in message:
@@ -394,11 +401,11 @@ def calcWalkCycle5(P0, P1, P2, P3, P4, bezierCurve_count, flatPoints_count, alph
 
     for i in range(1, len(jointAngles)):
         # Get the interpolated matrix for the current segment
-        interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
+        interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 30)
 
         # Stack it to the final matrix
         jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
-    print(points_inOrder)
+    #print(points_inOrder)
     return jointAngles_interpArray
 
 # functions for movement
@@ -481,11 +488,11 @@ def make_interp_array():
 def move_forward(reps, time, angle):
     bus = SMBus(7)
     set_pwm_freq(bus, 330)
-    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 10, angle)    #for fl leg [0]
-    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 10, -angle)   #for fr leg [1]
-    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 10, 0)
+    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
+    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
+    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
 
-    print(jointAngles_interpArray0)
+    #print(jointAngles_interpArray0)
 
     shift = len(jointAngles_interpArray0) // 2
     delay = time / reps / len(jointAngles_interpArray0)
