@@ -247,15 +247,18 @@
                                 Move Forward
                             </Button>
 
-                            <Button x:Name="move_stop_btn" Grid.Column="1" Grid.Row="1" Margin="30" Foreground="OrangeRed" >
+                            <Button x:Name="move_stop_btn" Grid.Column="1" Grid.Row="1" Margin="30" Foreground="OrangeRed"
+                                    Click="move_stop_btn_Click">
                                 STOP
                             </Button>
 
-                            <Button x:Name="move_left_btn" Grid.Column="0" Grid.Row="1" Margin="30">
+                            <Button x:Name="move_left_btn" Grid.Column="0" Grid.Row="1" Margin="30"
+                                    Click="move_left_btn_Click">
                                 Move Left
                             </Button>
 
-                            <Button x:Name="move_right_btn" Grid.Column="2" Grid.Row="1" Margin="30">
+                            <Button x:Name="move_right_btn" Grid.Column="2" Grid.Row="1" Margin="30"
+                                    Click="move_right_btn_Click">
                                 Move Right
                             </Button>
 
@@ -280,7 +283,7 @@
                             <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Velocity" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="velocity_sld" Minimum="0" Value="50" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="velocity_sld" Minimum="1" Value="50" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
                                         ValueChanged="velocity_sld_ValueChanged"/>
                             </StackPanel>
