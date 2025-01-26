@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -46,8 +47,23 @@ namespace HERO_GUI
             jetsonTcpThread = new Thread(InitializeTcpConnection);
             jetsonTcpThread.IsBackground = true;
             jetsonTcpThread.Start();
-        }
 
+            double batteryPercent = 0.5;
+
+            //Canvas.SetLeft(batLevel_rec, (int)490*batteryPercent);
+
+            // Create the animation
+            DoubleAnimation animation = new DoubleAnimation
+            {
+                From = 0,                  // Start position
+                To = 490,                 // End position
+                Duration = TimeSpan.FromSeconds(2), // Duration of animation
+                EasingFunction = new QuadraticEase() // Optional: Add easing for smoothness
+            };
+
+            // Apply the animation to the Canvas.Left property
+            batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
+        }
         private void InitializeTcpConnection()
         {
             try
@@ -157,6 +173,20 @@ namespace HERO_GUI
         private void move_right_btn_Click(object sender, RoutedEventArgs e)
         {
             new Thread(() => SendAndWaitForResponse("changeAngle30", "changedAngle", "moveForward5")).Start();
+        }
+
+        private void move_backward_btn_Click(object sender, RoutedEventArgs e)
+        {
+            DoubleAnimation animation = new DoubleAnimation
+            {
+                From = 0,                  // Start position
+                To = 490,                 // End position
+                Duration = TimeSpan.FromSeconds(2), // Duration of animation
+                EasingFunction = new QuadraticEase() // Optional: Add easing for smoothness
+            };
+
+            // Apply the animation to the Canvas.Left property
+            batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
         }
     }
 }

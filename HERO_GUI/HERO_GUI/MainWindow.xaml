@@ -208,12 +208,14 @@
                         <Label Content="100%" Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Right"
                                VerticalContentAlignment="Center"/>
 
-                        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" BorderBrush="Gray" BorderThickness="0.75"
+                        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" BorderThickness="0.75"
                                 Margin="5">
                             <Canvas x:Name="batLevel_cnv" HorizontalAlignment="Center" Width="500" Height="30">
                                 <Rectangle Fill="Red" Height="30" Width="80" Canvas.Left="0"/>
                                 <Rectangle Fill="Orange" Height="30" Width="120" Canvas.Left="80"/>
                                 <Rectangle Fill="Green" Height="30" Width="300" Canvas.Left="200"/>
+
+                                <Rectangle x:Name="batLevel_rec" Fill="Gray" Height="40" Width="10" Canvas.Left="0" Canvas.Top="-5"/>
                             </Canvas>
                         </Border>
                     </Grid>
@@ -262,7 +264,8 @@
                                 Move Right
                             </Button>
 
-                            <Button x:Name="move_backward_btn" Grid.Column="1" Grid.Row="2" Margin="30">
+                            <Button x:Name="move_backward_btn" Grid.Column="1" Grid.Row="2" Margin="30"
+                                    Click="move_backward_btn_Click">
                                 Move Backward
                             </Button>
                         </Grid>
