@@ -57,23 +57,26 @@ br0 = 13
 br1 = 14
 br2 = 15
     #calibration values
-fl0_calibValue = -5
+fl0_calibValue = -10
 fl1_calibValue = 10.5
 fl2_calibValue = -5
 
-fr0_calibValue = -8.5
-fr1_calibValue = -6
-fr2_calibValue = -2.5
+fr0_calibValue = -14
+fr1_calibValue = -11
+fr2_calibValue = -10
 
-bl0_calibValue = -1
-bl1_calibValue = -3.2
-bl2_calibValue = -4
+bl0_calibValue = -7.5
+bl1_calibValue = -9.3
+bl2_calibValue = -11
 
-br0_calibValue = -2.5
-br1_calibValue = -3.5
-br2_calibValue = 1
+br0_calibValue = -8.5
+br1_calibValue = -10
+br2_calibValue = -5
+
+walkingAngle = 0
 
 def handle_message(message, conn):
+    global walkingAngle
     if message == 'test123456789':
         print("Client said test123456789")
         conn.sendall(b"Hello, Client")
@@ -85,9 +88,12 @@ def handle_message(message, conn):
         conn.sendall("Moved".encode('utf-8'))
     elif "moveForward" in message:
         print(message[11:])
-        print("moving forward")
-        move_forward(int(message[11:]), 1, 0)
+        print(walkingAngle)
+        move_forward(int(message[11:]), 0.5, walkingAngle)
         print("Done")
+    elif "changeAngle" in message:
+        walkingAngle = int(message[11:])
+        conn.sendall("changedAngle".encode('utf-8'))
     elif "standUp" in message:
         stand_up()
     elif "makeInterpArray" in message:
