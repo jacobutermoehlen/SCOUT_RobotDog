@@ -39,7 +39,24 @@ namespace HERO_GUI
         public MainWindow()
         {
             InitializeComponent();
+            double percent = .1;
+            //Drawing SCOUT's distance circles
+            DrawPizzaSlice(348, 380, 100, 50, 80, Brushes.Green);
+            DrawPizzaSlice(348, 380, 60, 50, 80, Brushes.Yellow);
+            DrawPizzaSlice(348, 380, 30, 50, 80, Brushes.Red);
+            DrawRingSlice(348, 380, Convert.ToInt16(percent*100), Convert.ToInt16(percent * 100 + 5), 45, 90, Brushes.LightGray);
 
+            DrawPizzaSlice(348, 180, 100, 230, 80, Brushes.Green);
+            DrawPizzaSlice(348, 180, 60, 230, 80, Brushes.Yellow);
+            DrawPizzaSlice(348, 180, 30, 230, 80, Brushes.Red);
+
+            DrawPizzaSlice(298, 280, 100, 120, 120, Brushes.Green);
+            DrawPizzaSlice(298, 280, 60, 120, 120, Brushes.Yellow);
+            DrawPizzaSlice(298, 280, 30, 120, 120, Brushes.Red);
+
+            DrawPizzaSlice(398, 280, 100, 300, 120, Brushes.Green);
+            DrawPizzaSlice(398, 280, 60, 300, 120, Brushes.Yellow);
+            DrawPizzaSlice(398, 280, 30, 300, 120, Brushes.Red);
 
             //Starting Threads
             //Thread tcpSensor_readThread = new Thread(() => tcpSensor_ReadContin(sensorTCPIp, sensorTCPPort));
@@ -125,17 +142,19 @@ namespace HERO_GUI
         //movement control methods
         private void move_forward_btn_Click(object sender, RoutedEventArgs e)
         {
-            int veloc = Convert.ToInt16(velocity_sld.Value);
-            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle",$"moveForward{veloc}")).Start();
+            //int veloc = Convert.ToInt16(velocity_sld.Value);
+            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle",$"moveForward5")).Start();
         }
         private void velocity_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             velocity = (int)velocity_sld.Value;
+            SendAndWaitForResponse($"changeInter{velocity}", "changedInter", "");
         }
 
         private void height_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            rideHeigth = (int)height_sld.Value;
+            rideHeigth = (int)height_sld.Value * -1;
+            SendMessage($"moveN{rideHeigth}");
         }
 
 
@@ -167,12 +186,12 @@ namespace HERO_GUI
 
         private void move_left_btn_Click(object sender, RoutedEventArgs e)
         {
-            new Thread(() => SendAndWaitForResponse("changeAngle-30", "changedAngle", "moveForward5")).Start();
+            new Thread(() => SendAndWaitForResponse("changeAngle-30", "changedAngle", "none")).Start();
         }
 
         private void move_right_btn_Click(object sender, RoutedEventArgs e)
         {
-            new Thread(() => SendAndWaitForResponse("changeAngle30", "changedAngle", "moveForward5")).Start();
+            new Thread(() => SendAndWaitForResponse("changeAngle30", "changedAngle", "none")).Start();
         }
 
         private void move_backward_btn_Click(object sender, RoutedEventArgs e)

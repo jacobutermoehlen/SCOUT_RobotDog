@@ -286,7 +286,7 @@
                             <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Velocity" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="velocity_sld" Minimum="1" Value="50" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="velocity_sld" Minimum="1" Value="5" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
                                         ValueChanged="velocity_sld_ValueChanged"/>
                             </StackPanel>
@@ -295,12 +295,26 @@
                             <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Ride Height" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="height_sld" Minimum="120" Value="200" Maximum="280" TickFrequency="10" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="height_sld" Minimum="-280" Value="-200" Maximum="-120" TickFrequency="10" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
-                                        ValueChanged="height_sld_ValueChanged"/>
+                                        ValueChanged="height_sld_ValueChanged" />
                             </StackPanel>
                         </Grid>
                     </Border>
+                </Grid>
+                
+                <!--distance grid-->
+                <Grid x:Name="distance_grid" Grid.Column="0" Grid.Row="1" Height="700">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="560"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Canvas x:Name="distance_cnv" Grid.Row="0" VerticalAlignment="Top" Height="560" Width="696">
+                        <Rectangle x:Name="scout_rec" Fill="DarkGray" Width="100" Height="200"
+                                   Canvas.Left="298" Canvas.Top="180"/>
+                        
+                    </Canvas>
                 </Grid>
             </Grid>
         </TabItem>

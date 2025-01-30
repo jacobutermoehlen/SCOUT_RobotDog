@@ -74,9 +74,14 @@ br1_calibValue = -10
 br2_calibValue = -5
 
 walkingAngle = 0
+walkingInterval = 0.5
+
+walkingThread = None
 
 def handle_message(message, conn):
     global walkingAngle
+    global walkingInterval
+    global walkingThread
     if message == 'test123456789':
         print("Client said test123456789")
         conn.sendall(b"Hello, Client")
@@ -89,11 +94,17 @@ def handle_message(message, conn):
     elif "moveForward" in message:
         print(message[11:])
         print(walkingAngle)
-        move_forward(int(message[11:]), 0.5, walkingAngle)
+        if walkingThread is None or not walkingThread.is_alive():
+            walkingThread = threading.Thread(target=move_forward, args=(int(message[11:]), walkingInterval, walkingAngle))
+            walkingThread.start()
+        #move_forward(int(message[11:]), 0.5, walkingAngle)
         print("Done")
     elif "changeAngle" in message:
         walkingAngle = int(message[11:])
         conn.sendall("changedAngle".encode('utf-8'))
+    elif "changeInter" in message:
+        walkingInterval = float(message[11:])
+        conn.sendall("changedInter".encode('utf-8'))
     elif "standUp" in message:
         stand_up()
     elif "makeInterpArray" in message:
@@ -492,6 +503,8 @@ def make_interp_array():
         jointAngles_interpArray = np.vstack((jointAngles_interpArray, interpMatrix))
 
 def move_forward(reps, time, angle):
+    global walkingInterval
+    global walkingAngle
     bus = SMBus(7)
     set_pwm_freq(bus, 330)
     jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
@@ -499,6 +512,7 @@ def move_forward(reps, time, angle):
     jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
 
     #print(jointAngles_interpArray0)
+    angle2 = angle
 
     shift = len(jointAngles_interpArray0) // 2
     delay = time / reps / len(jointAngles_interpArray0)
@@ -506,6 +520,13 @@ def move_forward(reps, time, angle):
     for i in range(reps):
         print("test1")
         for j in range(len(jointAngles_interpArray0)):
+            if walkingAngle != angle2:
+                jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
+                jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
+                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+                angle2 = walkingAngle
+
+            delay = walkingInterval / reps / len(jointAngles_interpArray0)
             moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0, bus)                          #move front-left leg
 
             moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 1, bus)  #move front-right leg
