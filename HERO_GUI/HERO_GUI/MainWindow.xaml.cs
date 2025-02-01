@@ -32,6 +32,8 @@ namespace HERO_GUI
         private ManualResetEvent messageReceivedEvent = new ManualResetEvent(false);
         private string receivedMessage = string.Empty;
 
+        private bool heightThreadRunning = false;
+
         //variables
         int velocity = 50;
         int rideHeigth = 200;
@@ -143,7 +145,7 @@ namespace HERO_GUI
         private void move_forward_btn_Click(object sender, RoutedEventArgs e)
         {
             //int veloc = Convert.ToInt16(velocity_sld.Value);
-            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle",$"moveForward5")).Start();
+            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle","moveForward5")).Start();
         }
         private void velocity_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -154,7 +156,15 @@ namespace HERO_GUI
         private void height_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             rideHeigth = (int)height_sld.Value * -1;
-            SendMessage($"moveN{rideHeigth}");
+            //SendMessage($"moveN{rideHeigth}");
+            //new Thread(() => SendMessage($"moveN{rideHeigth}")).Start();
+
+            if (!heightThreadRunning)
+            {
+                heightThreadRunning = true;
+                int heightCopy = rideHeigth;
+                new Thread(() => { SendMessage($"moveN{heightCopy}"); Thread.Sleep(50); heightThreadRunning = false; }) { IsBackground = true }.Start();
+            }
         }
 
 
@@ -186,12 +196,12 @@ namespace HERO_GUI
 
         private void move_left_btn_Click(object sender, RoutedEventArgs e)
         {
-            new Thread(() => SendAndWaitForResponse("changeAngle-30", "changedAngle", "none")).Start();
+            new Thread(() => SendAndWaitForResponse("changeAngle-30", "changedAngle", "moveForward5")).Start();
         }
 
         private void move_right_btn_Click(object sender, RoutedEventArgs e)
         {
-            new Thread(() => SendAndWaitForResponse("changeAngle30", "changedAngle", "none")).Start();
+            new Thread(() => SendAndWaitForResponse("changeAngle30", "changedAngle", "moveForward5")).Start();
         }
 
         private void move_backward_btn_Click(object sender, RoutedEventArgs e)
