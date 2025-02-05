@@ -217,5 +217,15 @@ namespace HERO_GUI
             // Apply the animation to the Canvas.Left property
             batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
         }
+
+        private void move_forward_btn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward1")).Start();
+        }
+
+        private void move_forward_btn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward0")).Start();
+        }
     }
 }

@@ -41,7 +41,7 @@ PCA9685_ADDRESS = 0x40  # Default I2C address
 MODE1 = 0x00
 PRESCALE = 0xFE
 LED0_ON_L = 0x06
-FREQ = 50  # Frequency in Hz
+FREQ = 330  # Frequency in Hz
 
 # constants for invers kinematics
 lengthA = 35.7
@@ -83,8 +83,9 @@ br2_calibValue = 0
 
 walkingAngle = 0
 walkingInterval = 0.5
-
+walkingBool = True
 walkingThread = None
+walkingConstantlyThread = None
 
 bus = SMBus(7)
 
@@ -101,6 +102,16 @@ def handle_message(message, conn):
         print(message[5:])
         move_to_neutral(message[5:])
         conn.sendall("Moved".encode('utf-8'))
+    elif "moveCForward" in message:
+        print(message[12:])
+        if message[12:] == "0":
+            walkingBool = False
+        elif message[12:] == "1":
+            walkingBool == True
+            if walkingConstantlyThread is None or not walkingConstantlyThread.is_alive():
+                walkingConstantlyThread = threading.Thread(target=move_c_forward, args=(walkingInterval, walkingAngle))
+                walkingConstantlyThread.start()
+
     elif "moveForward" in message:
         print(message[11:])
         print(walkingAngle)
@@ -545,6 +556,39 @@ def move_forward(reps, time, angle):
             moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
             sleep(delay)
 
+def move_c_forward(time, angle):  #move forward constantly until walkBool is false
+    global walkingBool
+    global walkingInterval
+    global walkingAngle
+    global bus
+    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
+    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
+    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+
+    #print(jointAngles_interpArray0)
+    angle2 = angle
+
+    shift = len(jointAngles_interpArray0) // 2 - 1
+    delay = time / reps / len(jointAngles_interpArray0)
+
+    while(walkingBool == True):
+        print("test1")
+        for j in range(len(jointAngles_interpArray0)):
+            if walkingAngle != angle2:
+                jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
+                jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
+                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+                angle2 = walkingAngle
+
+            delay = walkingInterval / reps / len(jointAngles_interpArray0)
+            moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0, bus)                          #move front-left leg
+
+            moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 1, bus)  #move front-right leg
+
+            moveLeg(jointAngles_interpArray2_3[j - shift][0], jointAngles_interpArray2_3[j - shift][1], jointAngles_interpArray2_3[j - shift][2], 2, bus)  #move back-left leg
+
+            moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
+            sleep(delay)
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

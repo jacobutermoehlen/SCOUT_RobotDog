@@ -245,7 +245,8 @@
                             </Grid.RowDefinitions>
 
                             <Button x:Name="move_forward_btn" Grid.Column="1" Grid.Row="0" Margin="30"
-                                    Click="move_forward_btn_Click">
+                                    MouseLeftButtonDown="move_forward_btn_MouseLeftButtonDown"
+                                    MouseLeftButtonUp="move_forward_btn_MouseLeftButtonUp">
                                 Move Forward
                             </Button>
 
@@ -286,7 +287,7 @@
                             <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Velocity" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="velocity_sld" Minimum="0.5" Value="5" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="velocity_sld" Minimum="0.5" Value="5" Maximum="10" TickFrequency="0.5" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
                                         ValueChanged="velocity_sld_ValueChanged"/>
                             </StackPanel>
