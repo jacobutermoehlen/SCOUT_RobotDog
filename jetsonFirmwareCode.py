@@ -8,6 +8,7 @@ import threading
 
 #TCP Socket Setup
 server_ip = '192.168.4.1'
+#server_ip = '192.168.178.33'
 server_port = 12345
 
 
@@ -22,11 +23,18 @@ ride_height = 230
 #P3_1 = np.array([75, ride_height - 40, 35.7])
 #P4_1 = np.array([50, ride_height, 35.7])
 
-P0_1 = np.array([-30, ride_height, 70])
-P1_1 = np.array([-55, ride_height - 40, 70])
-P2_1 = np.array([0, ride_height - 60, 70])
-P3_1 = np.array([55, ride_height - 40, 70])
-P4_1 = np.array([30, ride_height, 70])
+#P0_1 = np.array([-30, ride_height, 70])
+#P1_1 = np.array([-55, ride_height - 40, 70])
+#P2_1 = np.array([0, ride_height - 60, 70])
+#P3_1 = np.array([55, ride_height - 40, 70])
+#P4_1 = np.array([30, ride_height, 70])
+
+P0_1 = np.array([-45, ride_height, 60])
+P1_1 = np.array([-70, ride_height - 35, 60])
+P2_1 = np.array([0, ride_height - 60, 60])
+P3_1 = np.array([70, ride_height - 35, 60])
+P4_1 = np.array([45, ride_height, 60])
+
 
 # Constants
 PCA9685_ADDRESS = 0x40  # Default I2C address
@@ -71,12 +79,14 @@ bl2_calibValue = -11
 
 br0_calibValue = -8.5
 br1_calibValue = -10
-br2_calibValue = -5
+br2_calibValue = 0
 
 walkingAngle = 0
 walkingInterval = 0.5
 
 walkingThread = None
+
+bus = SMBus(7)
 
 def handle_message(message, conn):
     global walkingAngle
@@ -427,8 +437,7 @@ def calcWalkCycle5(P0, P1, P2, P3, P4, bezierCurve_count, flatPoints_count, alph
 
 # functions for movement
 def stand_up():
-    bus = SMBus(7)
-    set_pwm_freq(bus, 330)
+    global bus
     startCords = calcInvKin(0, 100, 35.7)
     midCords = calcInvKin(0, 190, 35.7)
     endCords = calcInvKin(0, 200,35.7)
@@ -451,8 +460,9 @@ def stand_up():
     #plt.show()
 
 def move_to_neutral(height):
-    bus = SMBus(7)
-    set_pwm_freq(bus,330)
+    global bus
+    #bus = SMBus(7)
+    #set_pwm_freq(bus,330)
     neutralCords = calcInvKin(0, float(height), 35.7)[0]       # calc. Inverse Kinematics for neutral position for specific height
     print("Calculated Kin")
     #for l in range(4):                                                  
@@ -505,8 +515,7 @@ def make_interp_array():
 def move_forward(reps, time, angle):
     global walkingInterval
     global walkingAngle
-    bus = SMBus(7)
-    set_pwm_freq(bus, 330)
+    global bus
     jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
     jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
     jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
@@ -514,7 +523,7 @@ def move_forward(reps, time, angle):
     #print(jointAngles_interpArray0)
     angle2 = angle
 
-    shift = len(jointAngles_interpArray0) // 2
+    shift = len(jointAngles_interpArray0) // 2 - 1
     delay = time / reps / len(jointAngles_interpArray0)
 
     for i in range(reps):
@@ -631,4 +640,5 @@ fig, ax = plt.subplots(figsize=(6,6))
 
 if __name__ == "__main__":
     jointAngles_interpArray = np.empty((0,3))
+    set_pwm_freq(bus,330)
     start_server()
