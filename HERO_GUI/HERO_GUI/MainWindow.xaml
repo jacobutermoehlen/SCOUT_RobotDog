@@ -245,8 +245,8 @@
                             </Grid.RowDefinitions>
 
                             <Button x:Name="move_forward_btn" Grid.Column="1" Grid.Row="0" Margin="30"
-                                    MouseLeftButtonDown="move_forward_btn_MouseLeftButtonDown"
-                                    MouseLeftButtonUp="move_forward_btn_MouseLeftButtonUp">
+                                    PreviewMouseLeftButtonDown="move_forward_btn_MouseLeftButtonDown"
+                                    PreviewMouseLeftButtonUp="move_forward_btn_MouseLeftButtonUp">
                                 Move Forward
                             </Button>
 

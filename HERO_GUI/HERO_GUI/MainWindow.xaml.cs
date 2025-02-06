@@ -38,6 +38,8 @@ namespace HERO_GUI
         int velocity = 50;
         int rideHeigth = 200;
 
+        private bool isHoldingW = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -82,7 +84,29 @@ namespace HERO_GUI
 
             // Apply the animation to the Canvas.Left property
             batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
+
+            this.PreviewKeyDown += moveConstantlyForwardStart;
+            this.PreviewKeyUp += moveConstantlyForwardStop;
         }
+
+        private void moveConstantlyForwardStart(Object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.W && !isHoldingW)
+            {
+                isHoldingW = true;
+                new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward1")).Start();
+            }
+        }
+
+        private void moveConstantlyForwardStop(Object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.W)
+            {
+                isHoldingW = false;
+                new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward0")).Start();
+            }
+        }
+
         private void InitializeTcpConnection()
         {
             try
