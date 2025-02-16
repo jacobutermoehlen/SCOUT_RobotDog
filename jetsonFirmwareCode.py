@@ -126,6 +126,7 @@ def handle_message(message, conn):
     elif "changeAngle" in message:
         walkingAngle = int(message[11:])
         conn.sendall("changedAngle".encode('utf-8'))
+        print(walkingAngle)
     elif "changeInter" in message:
         walkingInterval = float(message[11:])
         conn.sendall("changedInter".encode('utf-8'))
@@ -567,7 +568,6 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
     jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
     jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
     jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
-
     #print(jointAngles_interpArray0)
     angle2 = angle
 
@@ -576,6 +576,7 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
 
     while(walkingBool == True):
         print("test1")
+        print(walkingAngle)
         for j in range(len(jointAngles_interpArray0)):
             if walkingAngle != angle2:
                 jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
