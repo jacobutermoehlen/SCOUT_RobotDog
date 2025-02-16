@@ -75,11 +75,11 @@ fr2_calibValue = -10
 
 bl0_calibValue = -7.5
 bl1_calibValue = -9.3
-bl2_calibValue = -11
+bl2_calibValue = 1
 
 br0_calibValue = -8.5
 br1_calibValue = -10
-br2_calibValue = 0
+br2_calibValue = 3
 
 walkingAngle = 0
 walkingInterval = 0.5
@@ -90,9 +90,12 @@ walkingConstantlyThread = None
 bus = SMBus(7)
 
 def handle_message(message, conn):
+    global walkingBool
     global walkingAngle
     global walkingInterval
     global walkingThread
+    global walkingConstantlyThread
+
     if message == 'test123456789':
         print("Client said test123456789")
         conn.sendall(b"Hello, Client")
@@ -104,14 +107,14 @@ def handle_message(message, conn):
         conn.sendall("Moved".encode('utf-8'))
     elif "moveCForward" in message:
         print(message[12:])
-        if message[12:] == "0":
+        if "0" in message[12:]:
             walkingBool = False
-        elif message[12:] == "1":
-            walkingBool == True
+        elif "1" in message[12:]:
+            #walkingBool == True
             if walkingConstantlyThread is None or not walkingConstantlyThread.is_alive():
                 walkingConstantlyThread = threading.Thread(target=move_c_forward, args=(walkingInterval, walkingAngle))
                 walkingConstantlyThread.start()
-
+            #walkingBool = False
     elif "moveForward" in message:
         print(message[11:])
         print(walkingAngle)
@@ -569,7 +572,7 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
     angle2 = angle
 
     shift = len(jointAngles_interpArray0) // 2 - 1
-    delay = time / reps / len(jointAngles_interpArray0)
+    delay = time / 5 / len(jointAngles_interpArray0)
 
     while(walkingBool == True):
         print("test1")
@@ -580,7 +583,7 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
                 jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
                 angle2 = walkingAngle
 
-            delay = walkingInterval / reps / len(jointAngles_interpArray0)
+            delay = walkingInterval / 5 / len(jointAngles_interpArray0)
             moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0, bus)                          #move front-left leg
 
             moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 1, bus)  #move front-right leg
@@ -589,6 +592,7 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
 
             moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
             sleep(delay)
+    walkingBool = True    
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -683,6 +687,7 @@ fig, ax = plt.subplots(figsize=(6,6))
 #plt.show()
 
 if __name__ == "__main__":
+    print("Started")
     jointAngles_interpArray = np.empty((0,3))
     set_pwm_freq(bus,330)
     start_server()
