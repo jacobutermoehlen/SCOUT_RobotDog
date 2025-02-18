@@ -94,6 +94,7 @@ def handle_message(message, conn):
     global walkingAngle
     global walkingInterval
     global walkingThread
+    global ride_height
     global walkingConstantlyThread
 
     if message == 'test123456789':
@@ -124,9 +125,19 @@ def handle_message(message, conn):
         #move_forward(int(message[11:]), 0.5, walkingAngle)
         print("Done")
     elif "changeAngle" in message:
-        walkingAngle = int(message[11:])
-        conn.sendall("changedAngle".encode('utf-8'))
-        print(walkingAngle)
+        if message[0] == "c":
+            walkingAngle = int(message[11:])
+            conn.sendall("changedAngle".encode('utf-8'))
+            print(walkingAngle)
+    elif "changeRideHeight" in message:
+        if message[0] == "c":
+            ride_height = int(message[16:0])
+            P0_1 = np.array([-45, ride_height, 60])
+            P1_1 = np.array([-70, ride_height - 35, 60])
+            P2_1 = np.array([0, ride_height - 60, 60])
+            P3_1 = np.array([70, ride_height - 35, 60])
+            P4_1 = np.array([45, ride_height, 60])
+            conn.sendall("changedRideHeight".encode('utf-8'))
     elif "changeInter" in message:
         walkingInterval = float(message[11:])
         conn.sendall("changedInter".encode('utf-8'))
@@ -558,6 +569,7 @@ def move_forward(reps, time, angle):
             moveLeg(jointAngles_interpArray2_3[j - shift][0], jointAngles_interpArray2_3[j - shift][1], jointAngles_interpArray2_3[j - shift][2], 2, bus)  #move back-left leg
 
             moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
+            moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)
             sleep(delay)
 
 def move_c_forward(time, angle):  #move forward constantly until walkBool is false

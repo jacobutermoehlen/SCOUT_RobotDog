@@ -37,8 +37,14 @@ namespace HERO_GUI
         //variables
         int velocity = 50;
         int rideHeigth = 200;
+        int angle = 0;
+        int curveAngle = 55;
 
         private bool isHoldingW = false;
+        private bool isHoldingA = false;
+        private bool isHoldingD = false;
+
+        private bool keyboardControl = false;
 
         public MainWindow()
         {
@@ -91,19 +97,88 @@ namespace HERO_GUI
 
         private void moveConstantlyForwardStart(Object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.W && !isHoldingW)
+            if(keyboardControl)
             {
-                isHoldingW = true;
-                new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward1")).Start();
+                if (e.Key == Key.W && !isHoldingW)
+                {
+                    isHoldingW = true;
+                    if (angle == 0)
+                    {
+                        new Thread(() => SendMessage("moveCForward1")).Start();
+                    }
+                    else
+                    {
+                        new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward1")).Start();
+                    }
+                }
+                else if (e.Key == Key.A && !isHoldingA)
+                {
+                    isHoldingA = true;
+
+                    if (angle == 0)
+                    {
+                        angle = -curveAngle;
+                        scout_rec.Fill = Brushes.Purple;
+                        //new Thread(() => SendAndWaitForResponse("changeAngle15", "changedAngle", "test123456789"));
+                        SendMessage($"changeAngle{angle}");
+                    }
+                }
+                else if (e.Key == Key.D && !isHoldingD)
+                {
+                    isHoldingD = true;
+
+                    if (angle == 0)
+                    {
+                        angle = curveAngle;
+                        scout_rec.Fill = Brushes.Yellow;
+                        //new Thread(() => SendAndWaitForResponse("changeAngle15", "changedAngle", "test123456789"));
+                        SendMessage($"changeAngle{angle}");
+                    }
+                }
             }
         }
 
         private void moveConstantlyForwardStop(Object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.W)
+            if (keyboardControl)
             {
-                isHoldingW = false;
-                new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward0")).Start();
+                if (e.Key == Key.W)
+                {
+                    isHoldingW = false;
+                    if (angle == 0)
+                    {
+                        new Thread(() => SendMessage("moveCForward0")).Start();
+                        grid_main.Background = Brushes.White;
+                    }
+                    else
+                    {
+                        new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward0")).Start();
+                    }
+                }
+                else if (e.Key == Key.A)
+                {
+                    isHoldingA = false;
+
+                    if (angle == -curveAngle)
+                    {
+
+                        angle = 0;
+
+                        SendMessage($"changeAngle{angle}");
+                    }
+                }
+                else if (e.Key == Key.D)
+                {
+                    isHoldingD = false;
+
+                    if (angle == curveAngle)
+                    {
+
+                        angle = 0;
+
+                        SendMessage($"changeAngle{angle}");
+                    }
+                }
             }
         }
 
@@ -215,7 +290,7 @@ namespace HERO_GUI
 
         private void move_stop_btn_Click(object sender, RoutedEventArgs e)
         {
-            new Thread(() => SendMessage("moveN230")).Start();
+            new Thread(() => SendMessage("stopMovement")).Start();
         }
 
         private void move_left_btn_Click(object sender, RoutedEventArgs e)
@@ -250,6 +325,26 @@ namespace HERO_GUI
         private void move_forward_btn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             new Thread(() => SendAndWaitForResponse("changeAngle0", "changedAngle", "moveCForward0")).Start();
+        }
+
+        private void keyboardToggle_ckb_Checked(object sender, RoutedEventArgs e)
+        {
+            keyboardControl = true;
+
+            move_forward_btn.IsEnabled = false;
+            move_left_btn.IsEnabled = false;
+            move_right_btn.IsEnabled = false;
+            move_backward_btn.IsEnabled = false;
+        }
+
+        private void keyboardToggle_ckb_Unchecked(object sender, RoutedEventArgs e)
+        {
+            keyboardControl = false;
+
+            move_forward_btn.IsEnabled = true;
+            move_left_btn.IsEnabled = true;
+            move_right_btn.IsEnabled = true;
+            move_backward_btn.IsEnabled = true;
         }
     }
 }

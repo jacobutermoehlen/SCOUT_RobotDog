@@ -9,7 +9,7 @@
 
     <TabControl>
         <TabItem Header="Main Control" x:Name="tab_main">
-            <Grid>
+            <Grid x:Name="grid_main">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="0.75*"/>
@@ -244,6 +244,35 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
+                            <Grid Grid.Column="0" Grid.Row="0" Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.8*"/>
+                                    <RowDefinition Height="1.2*"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <Label Content="Keyboard Control" HorizontalAlignment="Center" FontSize="18"/>
+                                    <CheckBox x:Name="keyboardToggle_ckb" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="15,0" Checked="keyboardToggle_ckb_Checked" Unchecked="keyboardToggle_ckb_Unchecked"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Control toggle" FontSize="18"/>
+                                        <CheckBox VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Move count:" FontSize="18"/>
+                                        <TextBox Width="50" Margin="15,0" Height="24" FontSize="18" Text="10"
+                                                    TextAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                            
                             <Button x:Name="move_forward_btn" Grid.Column="1" Grid.Row="0" Margin="30"
                                     PreviewMouseLeftButtonDown="move_forward_btn_MouseLeftButtonDown"
                                     PreviewMouseLeftButtonUp="move_forward_btn_MouseLeftButtonUp">
