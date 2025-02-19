@@ -1,0 +1,18 @@
+[StartTime]
+LowerLeg-Static 2.MFC=
+[SolverState]
+LowerLeg-Static 2.MFC=2
+[MainFrame]
+LowerLeg-Static 2.MFC=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPMEEAAAAAHGCAAAAAELFAAAAAKDDAAAAA
+[ShowMin]
+LowerLeg-Static 2.MFC=yes
+[SolverType]
+LowerLeg-Static 2.MFC=Linear Analysis
+[StudyType]
+LowerLeg-Static 2.MFC=-1
+[StudyName]
+LowerLeg-Static 2.MFC=Static 2
+[Solver]
+LowerLeg-Static 2.MFC=Iterative
+[Dynamic]
+LowerLeg-Static 2.MFC=0

@@ -316,7 +316,7 @@
                             <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Velocity" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="velocity_sld" Minimum="0.5" Value="5" Maximum="10" TickFrequency="0.5" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="velocity_sld" Minimum="0.1" Value="5" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
                                         ValueChanged="velocity_sld_ValueChanged"/>
                             </StackPanel>
@@ -325,7 +325,7 @@
                             <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                 <Label Content="Ride Height" Margin="10" HorizontalContentAlignment="Center"/>
-                                <Slider x:Name="height_sld" Minimum="-280" Value="-200" Maximum="-120" TickFrequency="1" IsSnapToTickEnabled="True" 
+                                <Slider x:Name="height_sld" Minimum="-280" Value="-230" Maximum="-120" TickFrequency="1" IsSnapToTickEnabled="True" 
                                         Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="Both" Height="300"
                                         ValueChanged="height_sld_ValueChanged" />
                             </StackPanel>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -35,7 +36,7 @@ namespace HERO_GUI
         private bool heightThreadRunning = false;
 
         //variables
-        int velocity = 50;
+        double velocity = 50;
         int rideHeigth = 200;
         int angle = 0;
         int curveAngle = 55;
@@ -218,7 +219,7 @@ namespace HERO_GUI
                 byte[] data = Encoding.UTF8.GetBytes(message);
                 networkStream.Write(data, 0, data.Length);
             }
-        }
+       }
 
         private void SendAndWaitForResponse(string messageToSend, string expectedResponse, string answer)
         {
@@ -248,8 +249,8 @@ namespace HERO_GUI
         }
         private void velocity_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            velocity = (int)velocity_sld.Value;
-            SendAndWaitForResponse($"changeInter{velocity}", "changedInter", "");
+            velocity = velocity_sld.Value;
+            SendAndWaitForResponse($"changeInter{velocity.ToString(CultureInfo.InvariantCulture)}", "changedInter", "");
         }
 
         private void height_sld_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -262,7 +263,8 @@ namespace HERO_GUI
             {
                 heightThreadRunning = true;
                 int heightCopy = rideHeigth;
-                new Thread(() => { SendMessage($"moveN{heightCopy}"); Thread.Sleep(50); heightThreadRunning = false; }) { IsBackground = true }.Start();
+                //new Thread(() => { SendMessage($"moveN{heightCopy}"); Thread.Sleep(100); heightThreadRunning = false; }) { IsBackground = true }.Start();
+                new Thread(() => { SendMessage($"changeRideHeight{heightCopy}"); Thread.Sleep(100); heightThreadRunning = false; }) { IsBackground = true }.Start();
             }
         }
 
