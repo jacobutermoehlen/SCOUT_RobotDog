@@ -14,7 +14,7 @@ server_port = 12345
 
 # variables
 UPDATE_INTERVAL_MS = 10
-ride_height = 230
+ride_height = 240
 
 # cycle preset 1
 #P0_1 = np.array([-50, ride_height, 35.7])
@@ -30,9 +30,9 @@ ride_height = 230
 #P4_1 = np.array([30, ride_height, 70])
 
 P0_1 = np.array([-45, ride_height, 60])
-P1_1 = np.array([-70, ride_height - 35, 60])
-P2_1 = np.array([0, ride_height - 60, 60])
-P3_1 = np.array([70, ride_height - 35, 60])
+P1_1 = np.array([-70, ride_height - 50, 60])
+P2_1 = np.array([0, ride_height - 75, 60])
+P3_1 = np.array([70, ride_height - 50, 60])
 P4_1 = np.array([45, ride_height, 60])
 
 
@@ -67,15 +67,15 @@ br2 = 15
     #calibration values
 fl0_calibValue = -10
 fl1_calibValue = 10.5
-fl2_calibValue = -5
+fl2_calibValue = +2.5
 
 fr0_calibValue = -14
 fr1_calibValue = -11
-fr2_calibValue = -10
+fr2_calibValue = -7
 
 bl0_calibValue = -7.5
 bl1_calibValue = -9.3
-bl2_calibValue = 1
+bl2_calibValue = 2
 
 br0_calibValue = -8.5
 br1_calibValue = -10
@@ -96,6 +96,11 @@ def handle_message(message, conn):
     global walkingThread
     global ride_height
     global walkingConstantlyThread
+    global P0_1
+    global P1_1
+    global P2_1
+    global P3_1
+    global P4_1
 
     if message == 'test123456789':
         print("Client said test123456789")
@@ -130,16 +135,17 @@ def handle_message(message, conn):
             conn.sendall("changedAngle".encode('utf-8'))
             print(walkingAngle)
     elif "changeRideHeight" in message:
+        print(message)
+        print("height")
         if message[0] == "c":
-            ride_height = int(message[16:0])
-            P0_1 = np.array([-45, ride_height, 60])
-            P1_1 = np.array([-70, ride_height - 35, 60])
-            P2_1 = np.array([0, ride_height - 60, 60])
-            P3_1 = np.array([70, ride_height - 35, 60])
-            P4_1 = np.array([45, ride_height, 60])
+            print(message[16:])
+            ride_height = int(message[16:])
+            print(ride_height)
             conn.sendall("changedRideHeight".encode('utf-8'))
     elif "changeInter" in message:
+        print(message[11:])
         walkingInterval = float(message[11:])
+        print(walkingInterval)
         conn.sendall("changedInter".encode('utf-8'))
     elif "standUp" in message:
         stand_up()
@@ -542,12 +548,19 @@ def move_forward(reps, time, angle):
     global walkingInterval
     global walkingAngle
     global bus
+    global ride_height
+    global P0_1
+    global P1_1
+    global P2_1
+    global P3_1
+    global P4_1
     jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
     jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
     jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
 
     #print(jointAngles_interpArray0)
     angle2 = angle
+    ride_height2 = 230
 
     shift = len(jointAngles_interpArray0) // 2 - 1
     delay = time / reps / len(jointAngles_interpArray0)
@@ -555,11 +568,12 @@ def move_forward(reps, time, angle):
     for i in range(reps):
         print("test1")
         for j in range(len(jointAngles_interpArray0)):
-            if walkingAngle != angle2:
+            if walkingAngle != angle2 or ride_height != ride_height2:
                 jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
                 jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
                 jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
                 angle2 = walkingAngle
+                ride_height2 = ride_height
 
             delay = walkingInterval / reps / len(jointAngles_interpArray0)
             moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0, bus)                          #move front-left leg
@@ -577,24 +591,38 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
     global walkingInterval
     global walkingAngle
     global bus
+    global ride_height
+    global P0_1
+    global P1_1
+    global P2_1
+    global P3_1
+    global P4_1
+    
     jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
     jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
     jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
     #print(jointAngles_interpArray0)
     angle2 = angle
+    ride_height2 = 240
 
-    shift = len(jointAngles_interpArray0) // 2 - 1
+    shift = len(jointAngles_interpArray0) // 2 + 1
     delay = time / 5 / len(jointAngles_interpArray0)
 
     while(walkingBool == True):
         print("test1")
         print(walkingAngle)
         for j in range(len(jointAngles_interpArray0)):
-            if walkingAngle != angle2:
+            if walkingAngle != angle2 or ride_height != ride_height2:
+                P0_1 = np.array([-45, ride_height, 60])
+                P1_1 = np.array([-70, ride_height - 50, 60])
+                P2_1 = np.array([0, ride_height - 75, 60])
+                P3_1 = np.array([70, ride_height - 50, 60])
+                P4_1 = np.array([45, ride_height, 60])
                 jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
                 jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
                 jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
                 angle2 = walkingAngle
+                ride_height2 = ride_height
 
             delay = walkingInterval / 5 / len(jointAngles_interpArray0)
             moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 0, bus)                          #move front-left leg
@@ -602,10 +630,10 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
             moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 1, bus)  #move front-right leg
 
             moveLeg(jointAngles_interpArray2_3[j - shift][0], jointAngles_interpArray2_3[j - shift][1], jointAngles_interpArray2_3[j - shift][2], 2, bus)  #move back-left leg
-            moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 2, bus)
+            #moveLeg(jointAngles_interpArray1[j - shift][0], jointAngles_interpArray1[j - shift][1], jointAngles_interpArray1[j - shift][2], 2, bus)
 
-            #moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
-            moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 3, bus)
+            moveLeg(jointAngles_interpArray2_3[j][0], jointAngles_interpArray2_3[j][1], jointAngles_interpArray2_3[j][2], 3, bus)                          #move back-right leg
+            #moveLeg(jointAngles_interpArray0[j][0], jointAngles_interpArray0[j][1], jointAngles_interpArray0[j][2], 3, bus)
             sleep(delay)
     walkingBool = True    
 
