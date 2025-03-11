@@ -5,12 +5,20 @@ from array import *
 from smbus2 import SMBus
 import socket
 import threading
+import serial
 
 #TCP Socket Setup
-server_ip = '192.168.4.1'
-#server_ip = '192.168.178.33'
-server_port = 12345
+controlServer_ip = '192.168.4.1'
+controlServer_port = 12345
+sensorServer_ip = '192.168.4.1'
+sensorServer_port = 12346
 
+#sensor serial setup
+ser = serial.Serial(
+    port="/dev/ttyTHS1",
+    baudrate=115200,
+    timeout=1
+)
 
 # variables
 UPDATE_INTERVAL_MS = 10
@@ -168,6 +176,18 @@ def receive_thread(conn):
             break
     print("Connection closed.")
     conn.close()
+
+def receiveSensor_thread(senConn):
+    while True:
+        try:
+            if ser.in_Waiting() > 0:
+                message = ser.readline().decode('utf-8').strip()
+                senConn.sendall(message.encode('utf-8'))
+        except Exception as e:
+            print(f"Sensor Error: {e}")
+            break
+    print("Sensor Connection closed.")
+    senConn.close()
 
 def set_pwm_freq(bus, freq_hz):
     prescale_val = int(25000000.0 / (4096 * freq_hz) - 1)
@@ -637,12 +657,12 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
             sleep(delay)
     walkingBool = True    
 
-def start_server():
+def start_controlServer():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind((server_ip, server_port))
+    server_socket.bind((controlServer_ip, controlServer_port))
     server_socket.listen(1)
-    print(f"Server listening on {server_ip}:{server_port}")
+    print(f"Server listening on {controlServer_ip}:{controlServer_port}")
 
     while True:
         conn, addr = server_socket.accept()
@@ -653,6 +673,17 @@ def start_server():
         #    message = "test"
         #    conn.sendall(message.encode('utf-8'))
 
+def start_sensorServer():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind((sensorServer_ip, sensorServer_port))
+    server_socket.listen(1)
+    print(f"Sensor server listening on {sensorServer_ip}:{sensorServer_port}")
+
+    while True:
+        senConn, addr = server_socket.accept()
+        print(f"Connection established with {addr}")
+        threading.Thread(target=receiveSensor_thread, args=(senConn,)).start()
 
 jointAngles0 = [[90.0, 10.1, 101.7],
                [90.0, 11.2, 92.6],
@@ -733,4 +764,5 @@ if __name__ == "__main__":
     print("Started")
     jointAngles_interpArray = np.empty((0,3))
     set_pwm_freq(bus,330)
-    start_server()
+    controlThread = threading.Thread(target=start_controlServer)
+    
