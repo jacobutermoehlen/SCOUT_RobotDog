@@ -178,11 +178,14 @@ def receive_thread(conn):
     conn.close()
 
 def receiveSensor_thread(senConn):
+    print("cool")
     while True:
         try:
-            if ser.in_Waiting() > 0:
+            if ser.inWaiting() > 0:
                 message = ser.readline().decode('utf-8').strip()
                 senConn.sendall(message.encode('utf-8'))
+                print(message + get_cpu_temperature())
+                #sleep(5/1000)
         except Exception as e:
             print(f"Sensor Error: {e}")
             break
@@ -674,16 +677,26 @@ def start_controlServer():
         #    conn.sendall(message.encode('utf-8'))
 
 def start_sensorServer():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind((sensorServer_ip, sensorServer_port))
-    server_socket.listen(1)
+    sensorServer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sensorServer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sensorServer_socket.bind((sensorServer_ip, sensorServer_port))
+    sensorServer_socket.listen(1)
     print(f"Sensor server listening on {sensorServer_ip}:{sensorServer_port}")
 
     while True:
-        senConn, addr = server_socket.accept()
-        print(f"Connection established with {addr}")
+        senConn, senAddr = sensorServer_socket.accept()
+        print(f"Sensor Connection established with {senAddr}")
         threading.Thread(target=receiveSensor_thread, args=(senConn,)).start()
+
+
+def get_cpu_temperature():
+    try:
+        with open('/sys/devices/virtual/thermal/thermal_zone0/temp', 'r') as f:
+            temp = f.read().strip()
+            temp_c = int(temp) / 1000.0
+            return f"{temp_c:.2f}°C"
+    except Exception as e:
+        return f"TempError: {e}"
 
 jointAngles0 = [[90.0, 10.1, 101.7],
                [90.0, 11.2, 92.6],
@@ -765,4 +778,6 @@ if __name__ == "__main__":
     jointAngles_interpArray = np.empty((0,3))
     set_pwm_freq(bus,330)
     controlThread = threading.Thread(target=start_controlServer)
+    controlThread.start()
+    start_sensorServer()
     
