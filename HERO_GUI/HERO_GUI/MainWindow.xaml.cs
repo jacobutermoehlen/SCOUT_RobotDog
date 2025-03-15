@@ -50,6 +50,7 @@ namespace HERO_GUI
         int rideHeigth = 200;
         int angle = 0;
         int curveAngle = 55;
+        double bat_Voltage = 0;
 
         private bool isHoldingW = false;
         private bool isHoldingA = false;
@@ -294,8 +295,23 @@ namespace HERO_GUI
                                     }
                                 }
                                 batVoltage_blk.Text = batterySb.ToString();
+                                try
+                                {
+                                    bat_Voltage = Convert.ToDouble(batterySb.ToString()) / 100.00;
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                                double bat_Percent = GetBatteryPercentage(bat_Voltage);
+                                DoubleAnimation animation = new DoubleAnimation
+                                {
+                                    From = 490 * (bat_Percent / 100),                  // Start position
+                                    To = 490 * (bat_Percent / 100),                 // End position
+                                    Duration = TimeSpan.FromSeconds(0), // Duration of animation
+                                    //EasingFunction = new QuadraticEase() // Optional: Add easing for smoothness
+                                };
 
-                                //handle voltage percent meter
+                                batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
                             });
                         }
                        
@@ -312,6 +328,52 @@ namespace HERO_GUI
             {
 
             }
+        }
+        private static readonly SortedDictionary<double, int> VoltagePercentageMap = new SortedDictionary<double, int>()
+    {
+        { 25.2, 100 }, { 24.9, 95 }, { 24.67, 90 }, { 24.49, 85 }, { 24.14, 80 },
+        { 23.9, 75 }, { 23.72, 70 }, { 23.48, 65 }, { 23.25, 60 }, { 23.13, 55 },
+        { 23.01, 50 }, { 22.89, 45 }, { 22.77, 40 }, { 22.72, 35 }, { 22.6, 30 },
+        { 22.48, 25 }, { 22.36, 20 }, { 22.24, 15 }, { 22.12, 10 }, { 21.65, 5 }, { 19.64, 0 }
+    };
+
+        public static double GetBatteryPercentage(double voltage)
+        {
+            if (voltage >= 25.2)
+            {
+                return 100;
+            }
+
+            if (voltage <= 19.64)
+            {
+                return 0;
+            }
+
+            double lowerVoltage = 0;
+            double upperVoltage = 0;
+            int lowerPercentage = 0;
+            int upperPercentage = 0;
+
+            foreach (var kvp in VoltagePercentageMap)
+            {
+                if (kvp.Key <= voltage)
+                {
+                    lowerVoltage = kvp.Key;
+                    lowerPercentage = kvp.Value;
+                }
+                else
+                {
+                    upperVoltage = kvp.Key;
+                    upperPercentage = kvp.Value;
+                    break;
+                }
+            }
+
+            // Apply a non-linear interpolation (e.g., exponential)
+            double ratio = (voltage - lowerVoltage) / (upperVoltage - lowerVoltage);
+            double interpolatedPercentage = lowerPercentage + (upperPercentage - lowerPercentage) * Math.Pow(ratio, 0.8); // Adjust exponent for curve
+
+            return interpolatedPercentage;
         }
 
         private void InitializeJetsonTcpConnection()

@@ -4,11 +4,11 @@
 winexe
 C#
 .cs
-C:\Users\Jacob\Documents\HERO_RobotDog\HERO_GUI\HERO_GUI\obj\Debug\
+C:\Users\Jacob\Documents\HERO_RobotDog\HERO_GUI\HERO_GUI\obj\Release\
 HERO_GUI
 none
 false
-DEBUG;TRACE
+TRACE
 C:\Users\Jacob\Documents\HERO_RobotDog\HERO_GUI\HERO_GUI\App.xaml
 1219584333
 
@@ -16,5 +16,5 @@ C:\Users\Jacob\Documents\HERO_RobotDog\HERO_GUI\HERO_GUI\App.xaml
 13-38814620
 MainWindow.xaml;
 
-False
+True
 

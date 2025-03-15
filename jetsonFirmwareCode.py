@@ -6,6 +6,8 @@ from smbus2 import SMBus
 import socket
 import threading
 import serial
+import time
+import math
 
 #TCP Socket Setup
 controlServer_ip = '192.168.4.1'
@@ -37,11 +39,17 @@ ride_height = 240
 #P3_1 = np.array([55, ride_height - 40, 70])
 #P4_1 = np.array([30, ride_height, 70])
 
-P0_1 = np.array([-45, ride_height, 60])
-P1_1 = np.array([-70, ride_height - 50, 60])
-P2_1 = np.array([0, ride_height - 75, 60])
-P3_1 = np.array([70, ride_height - 50, 60])
-P4_1 = np.array([45, ride_height, 60])
+P0_1_left = np.array([-45, ride_height, 60])
+P1_1_left = np.array([-70, ride_height - 50, 60])
+P2_1_left = np.array([0, ride_height - 75, 60])
+P3_1_left = np.array([70, ride_height - 50, 60])
+P4_1_left = np.array([45, ride_height, 60])
+
+P0_1_right = np.array([-45, ride_height, 60])
+P1_1_right = np.array([-70, ride_height - 50, 60])
+P2_1_right = np.array([0, ride_height - 75, 60])
+P3_1_right = np.array([70, ride_height - 50, 60])
+P4_1_right = np.array([45, ride_height, 60])
 
 
 # Constants
@@ -91,9 +99,19 @@ br2_calibValue = 3
 
 walkingAngle = 0
 walkingInterval = 0.5
+rollAngle = 0
 walkingBool = True
 walkingThread = None
 walkingConstantlyThread = None
+
+frontLeft_width = 60
+frontLeft_height = 240
+frontRight_width = 60
+frontRight_height = 240
+backLeft_width = 60
+backLeft_height = 240
+backRight_width = 60
+backRight_height = 240
 
 bus = SMBus(7)
 
@@ -104,11 +122,11 @@ def handle_message(message, conn):
     global walkingThread
     global ride_height
     global walkingConstantlyThread
-    global P0_1
-    global P1_1
-    global P2_1
-    global P3_1
-    global P4_1
+    global P0_1_left
+    global P1_1_left
+    global P2_1_left
+    global P3_1_left
+    global P4_1_left
 
     if message == 'test123456789':
         print("Client said test123456789")
@@ -178,13 +196,15 @@ def receive_thread(conn):
     conn.close()
 
 def receiveSensor_thread(senConn):
-    print("cool")
+    global rollAngle
     while True:
         try:
             if ser.inWaiting() > 0:
                 message = ser.readline().decode('utf-8').strip()
                 senConn.sendall(message.encode('utf-8'))
                 print(message + get_cpu_temperature())
+
+                rollAngle = message.split(',')[9]
                 #sleep(5/1000)
         except Exception as e:
             print(f"Sensor Error: {e}")
@@ -572,14 +592,14 @@ def move_forward(reps, time, angle):
     global walkingAngle
     global bus
     global ride_height
-    global P0_1
-    global P1_1
-    global P2_1
-    global P3_1
-    global P4_1
-    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
-    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
-    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+    global P0_1_left
+    global P1_1_left
+    global P2_1_left
+    global P3_1_left
+    global P4_1_left
+    jointAngles_interpArray0 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, angle)    #for fl leg [0]
+    jointAngles_interpArray1 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, -angle)   #for fr leg [1]
+    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, 0)
 
     #print(jointAngles_interpArray0)
     angle2 = angle
@@ -591,10 +611,13 @@ def move_forward(reps, time, angle):
     for i in range(reps):
         print("test1")
         for j in range(len(jointAngles_interpArray0)):
+
+            #variable walking width logic
+
             if walkingAngle != angle2 or ride_height != ride_height2:
-                jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
-                jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
-                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+                jointAngles_interpArray0 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, walkingAngle)    #for fl leg [0]
+                jointAngles_interpArray1 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, -walkingAngle)   #for fr leg [1]
+                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, 0)
                 angle2 = walkingAngle
                 ride_height2 = ride_height
 
@@ -615,15 +638,22 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
     global walkingAngle
     global bus
     global ride_height
-    global P0_1
-    global P1_1
-    global P2_1
-    global P3_1
-    global P4_1
+    global P0_1_left
+    global P1_1_left
+    global P2_1_left
+    global P3_1_left
+    global P4_1_left
+    global P0_1_right
+    global P1_1_right
+    global P2_1_right
+    global P3_1_right
+    global P4_1_right
+    global rollAngle
+    global pid
     
-    jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, angle)    #for fl leg [0]
-    jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -angle)   #for fr leg [1]
-    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+    jointAngles_interpArray0 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, angle)    #for fl leg [0]
+    jointAngles_interpArray1 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, -angle)   #for fr leg [1]
+    jointAngles_interpArray2_3 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, 0)
     #print(jointAngles_interpArray0)
     angle2 = angle
     ride_height2 = 240
@@ -636,14 +666,29 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
         print(walkingAngle)
         for j in range(len(jointAngles_interpArray0)):
             if walkingAngle != angle2 or ride_height != ride_height2:
-                P0_1 = np.array([-45, ride_height, 60])
-                P1_1 = np.array([-70, ride_height - 50, 60])
-                P2_1 = np.array([0, ride_height - 75, 60])
-                P3_1 = np.array([70, ride_height - 50, 60])
-                P4_1 = np.array([45, ride_height, 60])
-                jointAngles_interpArray0 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, walkingAngle)    #for fl leg [0]
-                jointAngles_interpArray1 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, -walkingAngle)   #for fr leg [1]
-                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1, P1_1, P2_1, P3_1, P4_1, 5, 9, 0)
+                #left side legs
+                leftLegDistance = 60
+                leftLegDistance = get_leg_distance(rollAngle)
+                P0_1_left = np.array([-45, ride_height, leftLegDistance])
+                P1_1_left = np.array([-70, ride_height - 50, leftLegDistance])
+                P2_1_left = np.array([0, ride_height - 75, leftLegDistance])
+                P3_1_left = np.array([70, ride_height - 50, leftLegDistance])
+                P4_1_left = np.array([45, ride_height, leftLegDistance])
+                jointAngles_interpArray0 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, walkingAngle)    #for fl leg [0]
+                jointAngles_interpArray1 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, -walkingAngle)   #for fr leg [1]
+                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_left, P3_1_left, P4_1_left, 5, 9, 0)
+
+                #right side legs
+                P0_1_right = np.array([-45, ride_height, 60])
+                P1_1_right = np.array([-70, ride_height - 50, 60])
+                P2_1_right = np.array([0, ride_height - 75, 60])
+                P3_1_right = np.array([70, ride_height - 50, 60])
+                P4_1_right = np.array([45, ride_height, 60])
+                jointAngles_interpArray0 = calcWalkCycle5(P0_1_right, P1_1_right, P2_1_right, P3_1_right, P4_1_right, 5, 9, walkingAngle)    #for fl leg [0]
+                jointAngles_interpArray1 = calcWalkCycle5(P0_1_right, P1_1_right, P2_1_right, P3_1_right, P4_1_right, 5, 9, -walkingAngle)   #for fr leg [1]
+                jointAngles_interpArray2_3 = calcWalkCycle5(P0_1_left, P1_1_left, P2_1_right, P3_1_right, P4_1_right, 5, 9, 0)
+
+
                 angle2 = walkingAngle
                 ride_height2 = ride_height
 
@@ -747,7 +792,54 @@ jointAngles2 = [
 
 fig, ax = plt.subplots(figsize=(6,6))
 
-    
+
+
+
+
+#PID-Controller
+class PIDController:
+    def __init__(self, Kp: float, Ki: float, Kd: float, setpoint: float = 0.0):
+        self.Kp = Kp  # Proportional gain
+        self.Ki = Ki  # Integral gain
+        self.Kd = Kd  # Derivative gain
+
+        self.setpoint = setpoint  # Desired target (zero tilt)
+        self.integral = 0.0
+        self.prev_error = 0.0
+        self.last_time = time.time()
+
+    def compute(self, input_value: float) -> float:
+        current_time = time.time()
+        dt = current_time - self.last_time if self.last_time else 1.0
+        self.last_time = current_time
+
+        error = self.setpoint - input_value
+        self.integral += error * dt
+        derivative = (error - self.prev_error) / dt if dt > 0 else 0
+
+        output = (self.Kp * error) + (self.Ki * self.integral) + (self.Kd * derivative)
+        self.prev_error = error
+
+        return output
+
+def get_leg_distance(angle: float, base_distance: float = 60.0) -> float:
+    """
+    Computes the new leg distance from the center using a PID controller.
+
+    :param angle: Roll or pitch angle in degrees.
+    :param base_distance: Default leg distance from the center in mm.
+    :return: Adjusted leg distance in mm.
+    """
+    correction = pid.compute(angle)
+    new_distance = base_distance + correction
+
+    # Limit movement to a reasonable range
+    min_distance = base_distance * 0.7
+    max_distance = base_distance * 1.3
+    return max(min_distance, min(max_distance, new_distance))
+
+
+
 #for i in range(1, len(jointAngles)):
 #    # Get the interpolated matrix for the current segment
 #    interpMatrix = makeFramesArray(jointAngles[i], currentPoints, 100)
@@ -774,6 +866,7 @@ fig, ax = plt.subplots(figsize=(6,6))
 #plt.show()
 
 if __name__ == "__main__":
+    pid = PIDController(Kp=0.5, Ki=0.1, Kd=0.05)
     print("Started")
     jointAngles_interpArray = np.empty((0,3))
     set_pwm_freq(bus,330)
