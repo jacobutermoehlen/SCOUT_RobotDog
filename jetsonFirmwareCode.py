@@ -197,14 +197,17 @@ def receive_thread(conn):
 
 def receiveSensor_thread(senConn):
     global rollAngle
+
     while True:
         try:
             if ser.inWaiting() > 0:
-                message = ser.readline().decode('utf-8').strip()
-                senConn.sendall(message.encode('utf-8'))
-                print(message + get_cpu_temperature())
-
-                rollAngle = message.split(',')[9]
+                message = ser.readline().strip() + " ".encode('utf-8') + get_cpu_temperature().encode('utf-8') + ",".encode('utf-8')
+                senConn.sendall(message)
+                #message = ser.readline().decode('utf-8').strip()
+                #senConn.sendall(message.encode('utf-8'))
+                #print(message.decode('utf-8'))
+                #rollAngleString = message.split(',')[9]
+                #rollAngle = string_to_double(rollAngleString)
                 #sleep(5/1000)
         except Exception as e:
             print(f"Sensor Error: {e}")
@@ -665,10 +668,12 @@ def move_c_forward(time, angle):  #move forward constantly until walkBool is fal
         print("test1")
         print(walkingAngle)
         for j in range(len(jointAngles_interpArray0)):
-            if walkingAngle != angle2 or ride_height != ride_height2:
+            if walkingAngle != angle2 or ride_height != ride_height2 or True:
                 #left side legs
                 leftLegDistance = 60
+                print(rollAngle)
                 leftLegDistance = get_leg_distance(rollAngle)
+                print(leftLegDistance)
                 P0_1_left = np.array([-45, ride_height, leftLegDistance])
                 P1_1_left = np.array([-70, ride_height - 50, leftLegDistance])
                 P2_1_left = np.array([0, ride_height - 75, leftLegDistance])
@@ -793,7 +798,11 @@ jointAngles2 = [
 fig, ax = plt.subplots(figsize=(6,6))
 
 
-
+def string_to_double(s:str) -> float:
+    try:
+        return float(s.lstrip('0') or '0')
+    except ValueError:
+        raise ValueError(f"Invalid Format: {s}")
 
 
 #PID-Controller
