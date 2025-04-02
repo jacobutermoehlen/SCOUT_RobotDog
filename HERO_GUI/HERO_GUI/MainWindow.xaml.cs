@@ -234,21 +234,21 @@ namespace HERO_GUI
                             main_sensor_grid.Dispatcher.BeginInvoke(() =>
                             {
                                 //Write to sensor console
-                                foreach(string sensorValue in sensorDataList)
-                                {
-                                    sensorString_TextBlock.Text += sensorValue + ",";
-                                }
-                                for(int j  = 0; j < sensorDataList.Count; j++)
-                                {
-                                    sensorData[j] = sensorDataList[j].ToString();
-                                }
+                                //foreach(string sensorValue in sensorDataList)
+                                //{
+                                //    sensorString_TextBlock.Text += sensorValue + ",";
+                                //}
+                                //for(int j  = 0; j < sensorDataList.Count; j++)
+                                //{
+                                //    sensorData[j] = sensorDataList[j].ToString();
+                                //}
+                                ////sensorString_TextBlock.Text += "\n";
+                                ////sensorString_TextBlock.Text += sensorReceivedMessage + "\n";
                                 //sensorString_TextBlock.Text += "\n";
-                                //sensorString_TextBlock.Text += sensorReceivedMessage + "\n";
-                                sensorString_TextBlock.Text += "\n";
-                                if (ConsoleScrollViewer.VerticalOffset >= ConsoleScrollViewer.ScrollableHeight)
-                                {
-                                    ConsoleScrollViewer.ScrollToEnd();
-                                }
+                                //if (ConsoleScrollViewer.VerticalOffset >= ConsoleScrollViewer.ScrollableHeight)
+                                //{
+                                //    ConsoleScrollViewer.ScrollToEnd();
+                                //}
 
                                 //tof front
 
@@ -280,38 +280,46 @@ namespace HERO_GUI
                                 //double magX = Convert.ToDouble(sensorData[10]);
                                 //double magY = Convert.ToDouble(sensorData[11]);
                                 //double magZ = Convert.ToDouble(sensorData[12]);
-
-                                //icm temp
-                                temp_blk.Text = sensorData[13];
-
-                                //ina bus voltage
-                                //batVoltage_blk.Text = sensorData[14];
-                                StringBuilder batterySb = new StringBuilder();
-                                foreach (char b in sensorData[14])
-                                {
-                                    if (b != 'S')
-                                    {
-                                        batterySb.Append(b);
-                                    }
-                                }
-                                batVoltage_blk.Text = batterySb.ToString();
                                 try
                                 {
-                                    bat_Voltage = Convert.ToDouble(batterySb.ToString()) / 100.00;
-                                }
-                                catch (Exception e)
-                                {
-                                }
-                                double bat_Percent = GetBatteryPercentage(bat_Voltage);
-                                DoubleAnimation animation = new DoubleAnimation
-                                {
-                                    From = 490 * (bat_Percent / 100),                  // Start position
-                                    To = 490 * (bat_Percent / 100),                 // End position
-                                    Duration = TimeSpan.FromSeconds(0), // Duration of animation
-                                    //EasingFunction = new QuadraticEase() // Optional: Add easing for smoothness
-                                };
+                                    //icm temp
+                                    temp_blk.Text = sensorData[13];
+                                    temp_blk.Text += "°C";
+                                    temp_blk.Text += sensorData[15];
 
-                                batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
+                                    //ina bus voltage
+                                    //batVoltage_blk.Text = sensorData[14];
+                                    StringBuilder batterySb = new StringBuilder();
+                                    foreach (char b in sensorData[14])
+                                    {
+                                        if (b != 'S')
+                                        {
+                                            batterySb.Append(b);
+                                        }
+                                    }
+                                    batVoltage_blk.Text = batterySb.ToString();
+                                    try
+                                    {
+                                        bat_Voltage = Convert.ToDouble(batterySb.ToString()) / 100.00;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                    double bat_Percent = GetBatteryPercentage(bat_Voltage);
+                                    DoubleAnimation animation = new DoubleAnimation
+                                    {
+                                        From = 490 * (bat_Percent / 100),                  // Start position
+                                        To = 490 * (bat_Percent / 100),                 // End position
+                                        Duration = TimeSpan.FromSeconds(0), // Duration of animation
+                                                                            //EasingFunction = new QuadraticEase() // Optional: Add easing for smoothness
+                                    };
+
+                                    batLevel_rec.BeginAnimation(Canvas.LeftProperty, animation);
+                                } catch(Exception ex)
+                                { 
+                                }
+
+                                
                             });
                         }
                        
